@@ -27,7 +27,7 @@ def analyze(connection):
 
     avg_jobs = int(round(float(sum(jobs)) / len(jobs)))
     avg_procs = int(round(float(sum(procs)) / len(procs)))
-    print "CSC108 runs ~%s jobs on ~%s processors in backfill on average." % \
+    print "CSC108 is typically running ~%s backfill jobs on ~%s processors." % \
         (avg_jobs, avg_procs)
 
 ###
