@@ -14,8 +14,8 @@
 #                                                   ~~ last updated 15 Jun 2018
 
 #-  Experimental data
-.sqlite
-.xml
+*.sqlite
+*.xml
 
 #-  OS generated files
 .DS_Store*
