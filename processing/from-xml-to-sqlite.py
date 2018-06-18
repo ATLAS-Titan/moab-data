@@ -3,14 +3,14 @@
 #-  from-xml-to-sqlite.py ~~
 #
 #   This program converts the raw XML files into a queryable SQL database
-#   using SQLite. Right now, this script is still configured to run on my
-#   laptop instead of on Titan or Rhea.
+#   using SQLite. Right now, this script is being tested for use on machines
+#   that are local to the data as well as machines that are local to the user.
 #
 #   I used Python here with extensive inline SQL using heredocs because that's
 #   what the group has used elsewhere in the BigPanDA project as well.
 #
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 15 Jun 2018
+#                                                   ~~ last updated 18 Jun 2018
 
 import os
 import sqlite3
@@ -187,9 +187,9 @@ def readXML(filename):
 
 ###
 
-def showbfImport(conn):
+def showbfImport(conn, data_dir):
 
-    showbf_dir = os.path.join(os.getenv("PWD"), "moab", "showbf")
+    showbf_dir = os.path.join(data_dir, "showbf")
 
     for filename in os.listdir(showbf_dir):
         if filename.endswith("-out.xml"):
@@ -247,9 +247,9 @@ def showbfXMLtoSQL(text, conn):
 
 ###
 
-def showqImport(conn):
+def showqImport(conn, data_dir):
 
-    showq_dir = os.path.join(os.getenv("PWD"), "moab", "showq")
+    showq_dir = os.path.join(data_dir, "showq")
 
     for filename in os.listdir(showq_dir):
         if filename.endswith("-out.xml"):
@@ -448,13 +448,34 @@ def showqXMLtoSQL(text, conn):
 
 def main():
 
-    dbfilename = os.path.join(os.getenv("PWD"), "moab-data.sqlite")
+  # Store current working directory.
+
+    cwd = os.getcwd()
+
+  # Find the data directory, where this script is running remotely at OLCF and
+  # locally on a personal laptop, for example.
+
+    if os.path.isdir("/lustre/atlas/proj-shared/csc108/data/moab/"):
+        data_dir = "/lustre/atlas/proj-shared/csc108/data/moab/"
+    elif os.path.isdir(os.path.join(cwd, "moab")):
+        data_dir = os.path.join(cwd, "moab")
+    else:
+        raise "Data directory not found."
+
+  # Create the database file in the data directory and connect Python to it.
+
+    dbfilename = os.path.join(data_dir, "moab-data.sqlite")
 
     conn = sqlite3.connect(dbfilename)
 
     initDB(conn)
-    showbfImport(conn)
-    showqImport(conn)
+
+  # Start populating the database from the raw XML files.
+
+    showbfImport(conn, data_dir)
+    showqImport(conn, data_dir)
+
+  # When we are finished, close the connection to the database.
 
     conn.close()
 
