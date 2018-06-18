@@ -2,7 +2,7 @@
 
 #-  compute-avg-local-idle-procs.py ~~
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 15 Jun 2018
+#                                                   ~~ last updated 18 Jun 2018
 
 import os
 import sqlite3
@@ -32,9 +32,23 @@ def analyze(connection):
 
 def main():
 
+  # Store current working directory.
+
+    cwd = os.getcwd()
+
+  # Find the data directory, where this script is running remotely at OLCF and
+  # locally on a personal laptop, for example.
+
+    if os.path.isdir("/lustre/atlas/proj-shared/csc108/data/moab/"):
+        data_dir = "/lustre/atlas/proj-shared/csc108/data/moab/"
+    elif os.path.isdir(os.path.join(cwd, "moab")):
+        data_dir = os.path.join(cwd, "moab")
+    else:
+        raise "Data directory not found."
+
   # Create string to represent path to database file.
 
-    dbfilename = os.path.join(os.getenv("PWD"), "moab-data.sqlite")
+    dbfilename = os.path.join(data_dir, "moab-data.sqlite")
 
   # Open connection to the database (file).
 
