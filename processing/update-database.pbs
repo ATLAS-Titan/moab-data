@@ -1,26 +1,35 @@
 #!/bin/bash
-#PBS -A CSC108
-#PBS -l nodes=1,partition=rhea,walltime=0:10:00
-#PBS -M sean.wilkinson@cern.ch
-#PBS -m a
-#PBS -m b
-#PBS -m e
-#PBS -N update-database
-
+#
 #-  PBS batch script
-
+#
 #-  update-database.pbs ~~
 #
-#   This program deviates from my normal habit of putting a commented summary
-#   at the beginning of a file because the PBS system (https://pbsworks.com/)
-#   requires it. I'm going to keep working on this to see if I can get it to
-#   submit compute jobs to the queue from a cron job. Right now, it takes 3-4
-#   minutes to run on a Rhea compute node, and the compute time will continue
-#   to grow until I implement a table in the database itself or something that
-#   records which XML files have already been successfully imported.
+#   This program is a shell script written for submission to Rhea via PBS. For
+#   more information, see
+#
+#   https://www.olcf.ornl.gov/for-users/system-user-guides/rhea/running-jobs/.
+#
+#   Right now, this job runs once per day on Rhea via a cron job on a Data 
+#   Transfer Node (DTN), and it takes 3-4 minutes to run. The compute time will
+#   continue to grow until I implement a table in the database itself or
+#   something that records which XML files have already been successfully
+#   imported.
+#
+#   NOTE: The lines beginning with "#PBS" are not comments. They are directives
+#   to the PBS system, and they will only be read if every line preceding them
+#   in the file is a commented line.
 #
 #                                                       ~~ (c) SRW, 18 Jun 2018
 #                                                   ~~ last updated 18 Jun 2018
+#
+#PBS -A CSC108
+#PBS -j oe
+#PBS -l nodes=1,partition=rhea,walltime=0:10:00
+#PBS -M sean.wilkinson@cern.ch
+#PBS -m a
+#PBS -m e
+#PBS -N update-database
+#PBS -o /dev/null
 
 /usr/bin/python2 ${HOME}/moab-data--git/processing/from-xml-to-sqlite.py
 
