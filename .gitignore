@@ -11,11 +11,17 @@
 #   control -- always execute your commits manually!
 #
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 15 Jun 2018
+#                                                   ~~ last updated 18 Jun 2018
 
 #-  Experimental data
 *.sqlite
 *.xml
+
+#-  PBS output files
+*.e[0-9]*
+*.ER
+*.o[0-9]*
+*.OU
 
 #-  OS generated files
 .DS_Store*
