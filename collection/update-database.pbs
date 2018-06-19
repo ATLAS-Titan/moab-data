@@ -20,7 +20,7 @@
 #   in the file is a commented line.
 #
 #                                                       ~~ (c) SRW, 18 Jun 2018
-#                                                   ~~ last updated 18 Jun 2018
+#                                                   ~~ last updated 19 Jun 2018
 #
 #PBS -A CSC108
 #PBS -j oe
@@ -31,6 +31,6 @@
 #PBS -N update-database
 #PBS -o /dev/null
 
-/usr/bin/python2 ${HOME}/moab-data--git/processing/from-xml-to-sqlite.py
+/usr/bin/python2 ${HOME}/moab-data--git/collection/from-xml-to-sqlite.py
 
 #-  vim:set syntax=sh:

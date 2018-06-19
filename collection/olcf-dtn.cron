@@ -1,0 +1,26 @@
+#-  Crontab file
+
+#-  olcf-dtn.cron ~~
+#
+#   This cron file is currently running on a Data Transfer Node at Oak Ridge
+#   Leadership Computing Facility. It is commented and included in this
+#   repository in the interest of total transparency.
+#
+#   To use this file from the Git base directory, use
+#
+#       $ crontab ./collection/olcf-dtn.cron
+#
+#                                                       ~~ (c) SRW, 19 Jun 2018
+#                                                   ~~ last updated 19 Jun 2018
+
+#-  Every 10 minutes, collect the XML data from MOAB using the script included
+#   in the Git repository.
+
+*/10 * * * * python2 ${HOME}/moab-data--git/collection/log-xml-data.py
+
+#-  Every night at midnight, submit a job defined in the PBS script included
+#   in the Git repository to Rhea to rebuild/update the SQLite database.
+
+0 0 * * * qsub -q rhea ${HOME}/moab-data--git/collection/update-database.pbs
+
+#-  vim:set syntax=crontab:
