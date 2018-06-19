@@ -1,6 +1,6 @@
 #-  Python 2.6 source code (also tested with 2.7)
 
-#-  log-xml-data.py ~~
+#-  collect-xml-data.py ~~
 #
 #   This program is designed to run as a cron job that will capture XML output
 #   from MOAB's "showbf" and "showq" to files to be processed later. This
@@ -11,7 +11,7 @@
 #   with subdirectories to store the XML files.
 #
 #                                                       ~~ (c) SRW, 06 Jun 2018
-#                                                   ~~ last updated 15 Jun 2018
+#                                                   ~~ last updated 19 Jun 2018
 
 import os
 import subprocess

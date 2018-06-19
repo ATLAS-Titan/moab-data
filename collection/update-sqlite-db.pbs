@@ -2,7 +2,7 @@
 #
 #-  PBS batch script
 #
-#-  update-database.pbs ~~
+#-  update-sqlite-db.pbs ~~
 #
 #   This program is a shell script written for submission to Rhea via PBS. For
 #   more information, see
@@ -28,7 +28,7 @@
 #PBS -M sean.wilkinson@cern.ch
 #PBS -m a
 #PBS -m e
-#PBS -N update-database
+#PBS -N update-sqlite-db
 #PBS -o /dev/null
 
 /usr/bin/python2 ${HOME}/moab-data--git/collection/from-xml-to-sqlite.py
