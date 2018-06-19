@@ -11,17 +11,17 @@
 #   control -- always execute your commits manually!
 #
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 18 Jun 2018
+#                                                   ~~ last updated 19 Jun 2018
 
 #-  Experimental data
 *.sqlite
 *.xml
 
-#-  PBS output files
-*.e[0-9]*
-*.ER
-*.o[0-9]*
-*.OU
+#-  netrw history file? (see: http://goo.gl/jhzdJ)
+.netrwhist
+
+#-  NFS "silly rename" files
+.nfs[0-9a-f]*
 
 #-  OS generated files
 .DS_Store*
@@ -30,8 +30,11 @@ Icon\?
 .localized
 Thumbs.db
 
-#-  netrw history file? (see: http://goo.gl/jhzdJ)
-.netrwhist
+#-  PBS output files
+*.e[0-9]*
+*.ER
+*.o[0-9]*
+*.OU
 
 #-  Vim swap files
 *.swp
