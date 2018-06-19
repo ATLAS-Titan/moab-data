@@ -2,7 +2,7 @@
 
 #-  olcf-dtn.cron ~~
 #
-#   This cron file is currently running on a Data Transfer Node at Oak Ridge
+#   This crontab file is currently running on a Data Transfer Node at Oak Ridge
 #   Leadership Computing Facility. It is commented and included in this
 #   repository in the interest of total transparency.
 #

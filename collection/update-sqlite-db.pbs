@@ -22,13 +22,26 @@
 #                                                       ~~ (c) SRW, 18 Jun 2018
 #                                                   ~~ last updated 19 Jun 2018
 #
+#-  Charge to the CSC108 project.
 #PBS -A CSC108
+#
+#-  Combine standard output and standard error into the standard out file.
 #PBS -j oe
+#
+#-  Use one node on the Rhea partition for no more than 10 minutes.
 #PBS -l nodes=1,partition=rhea,walltime=0:10:00
+#
+#-  Use Sean's CERN email for status updates
 #PBS -M sean.wilkinson@cern.ch
+#
+#-  Send email if the job aborts and when the job ends.
 #PBS -m a
 #PBS -m e
+#
+#-  Set the job name.
 #PBS -N update-sqlite-db
+#
+#-  Send the standard output to the null device.
 #PBS -o /dev/null
 
 /usr/bin/python2 ${HOME}/moab-data--git/collection/from-xml-to-sqlite.py
