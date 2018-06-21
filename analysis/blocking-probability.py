@@ -7,6 +7,10 @@
 #   would have run in backfill except CSC108 had already claimed backfill's
 #   resources.
 #
+#   Initial value using data through June 20 is 842/1758 (0.48), which is much
+#   higher than expected. This value may indicate that I got the conditions
+#   totally wrong.
+#
 #                                                       ~~ (c) SRW, 21 Jun 2018
 #                                                   ~~ last updated 21 Jun 2018
 
