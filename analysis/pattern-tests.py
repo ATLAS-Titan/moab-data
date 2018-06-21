@@ -6,7 +6,7 @@
 #   I have noticed in the data actually hold for the entire dataset.
 #
 #                                                       ~~ (c) SRW, 20 Jun 2018
-#                                                   ~~ last updated 20 Jun 2018
+#                                                   ~~ last updated 21 Jun 2018
 
 import os
 import sqlite3
@@ -29,6 +29,18 @@ def analyze(connection):
             ratio = float(row["LocalUpProcs"]) / row["LocalUpNodes"]
             if ratio != 16.0:
                 print "Up ratio: %s" % ratio
+
+  # Check that certain values are always zero in the "showbf" table.
+
+    query = """
+        SELECT * FROM showbf;
+        """
+
+    for row in cursor.execute(query):
+        if row["index_"] != 0:
+            print "index_ is non-zero in showbf table: %s" % row["index_"]
+        if row["reqid"] != 0:
+            print "reqid is non-zero in showbf table: %s" % row["reqid"]
 
 ###
 
