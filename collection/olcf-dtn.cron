@@ -11,12 +11,12 @@
 #       $ crontab ./collection/olcf-dtn.cron
 #
 #                                                       ~~ (c) SRW, 19 Jun 2018
-#                                                   ~~ last updated 19 Jun 2018
+#                                                   ~~ last updated 22 Jun 2018
 
-#-  Every 10 minutes, collect the XML data from MOAB using the script included
+#-  Every 5 minutes, collect the XML data from MOAB using the script included
 #   in the Git repository.
 
-*/10 * * * * python2 ${HOME}/moab-data--git/collection/collect-xml-data.py
+*/5 * * * * python2 ${HOME}/moab-data--git/collection/collect-xml-data.py
 
 #-  Every night at midnight, submit a job defined in the PBS script included
 #   in the Git repository to Rhea to rebuild/update the SQLite database.

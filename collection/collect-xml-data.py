@@ -11,7 +11,7 @@
 #   with subdirectories to store the XML files.
 #
 #                                                       ~~ (c) SRW, 06 Jun 2018
-#                                                   ~~ last updated 19 Jun 2018
+#                                                   ~~ last updated 22 Jun 2018
 
 import os
 import subprocess
@@ -60,7 +60,7 @@ def sample():
   # elected not to use it, due to the fact that 10% of my queries on the first
   # day of using it failed due to "resources unavailable" errors. The previous
   # day, when I used cached data, I had zero errors. Since we are only sampling
-  # every 10 minutes anyway, there is no reason to worry about stale query
+  # every 5 minutes anyway, there is no reason to worry about stale query
   # results. The "--blocking" flag is extremely important for the operation of
   # BigPanDA but not for gathering data about MOAB.
 
