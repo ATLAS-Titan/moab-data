@@ -12,10 +12,7 @@
 #                                                       ~~ (c) SRW, 22 Jun 2018
 #                                                   ~~ last updated 22 Jun 2018
 
-import json
-import matplotlib
 import matplotlib.pyplot as pyplot
-#import numpy as np
 import os
 import sqlite3
 
