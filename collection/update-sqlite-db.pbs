@@ -10,17 +10,16 @@
 #   https://www.olcf.ornl.gov/for-users/system-user-guides/rhea/running-jobs/.
 #
 #   Right now, this job runs once per day on Rhea via a cron job on a Data 
-#   Transfer Node (DTN), and it originally took 3-4 minutes to run. The compute
-#   time will continue to grow until I implement a table in the database itself
-#   or something to records which XML files have already been successfully
-#   imported.
+#   Transfer Node (DTN), and it originally took 3-4 minutes to run to build
+#   from scratch. On my laptop, it updates in less than a second, so I fully
+#   expect 10 minutes on a dedicated node on Rhea to be overkill.
 #
 #   NOTE: The lines beginning with "#PBS" are not comments. They are directives
 #   to the PBS system, and they will only be read if every line preceding them
 #   in the file is a commented line.
 #
 #                                                       ~~ (c) SRW, 18 Jun 2018
-#                                                   ~~ last updated 20 Jun 2018
+#                                                   ~~ last updated 22 Jun 2018
 #
 #-  Charge to the CSC108 project's account.
 #PBS -A CSC108
@@ -28,8 +27,8 @@
 #-  Combine standard output and standard error into the standard out file.
 #PBS -j oe
 #
-#-  Use one node on the Rhea partition for no more than 20 minutes.
-#PBS -l nodes=1,partition=rhea,walltime=0:20:00
+#-  Use one node on the Rhea partition for no more than 10 minutes.
+#PBS -l nodes=1,partition=rhea,walltime=0:10:00
 #
 #-  Use Sean's CERN email for status updates
 #PBS -M sean.wilkinson@cern.ch
