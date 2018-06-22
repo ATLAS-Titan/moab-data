@@ -24,5 +24,5 @@ on Titan is to
 running any of the analysis scripts:
 
     $ module load python_anaconda
-    $ python analysis/example.py # which doesn't exist, by the way
+    $ python analysis/visualization-template.py
 
