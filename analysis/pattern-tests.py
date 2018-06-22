@@ -6,7 +6,7 @@
 #   I have noticed in the data actually hold for the entire dataset.
 #
 #                                                       ~~ (c) SRW, 20 Jun 2018
-#                                                   ~~ last updated 21 Jun 2018
+#                                                   ~~ last updated 22 Jun 2018
 
 import os
 import sqlite3
@@ -37,10 +37,23 @@ def analyze(connection):
         """
 
     for row in cursor.execute(query):
-        if row["index_"] != 0:
-            print "index_ is non-zero in showbf table: %s" % row["index_"]
-        if row["reqid"] != 0:
-            print "reqid is non-zero in showbf table: %s" % row["reqid"]
+        fields_that_should_be_zero = ["index_", "reqid"]
+        for field in fields_that_should_be_zero:
+            if row[field] != 0:
+                print "%s is non-zero in showbf: %s" % (field, row[field])
+
+    query = """
+        SELECT * FROM showq_meta;
+        """
+
+    for row in cursor.execute(query):
+        fields_that_should_be_zero = [
+            "RemoteAllocProcs", "RemoteConfigNodes", "RemoteIdleNodes",
+            "RemoteIdleProcs", "RemoteUpNodes", "RemoteUpProcs"
+        ]
+        for field in fields_that_should_be_zero:
+            if row[field] != 0:
+                print "%s is non-zero in showq_meta: %s" % (field, row[field])
 
 ###
 
