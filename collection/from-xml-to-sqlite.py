@@ -10,7 +10,7 @@
 #   what the group has used elsewhere in the BigPanDA project as well.
 #
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 18 Jun 2018
+#                                                   ~~ last updated 22 Jun 2018
 
 import os
 import sqlite3
@@ -164,6 +164,22 @@ def initDB(conn):
         )
         """)
 
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS files_showbf (
+            errfilecontents STRING,
+            errfilename STRING UNIQUE NOT NULL,
+            outfilename STRING UNIQUE NOT NULL
+        );
+        """)
+
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS files_showq (
+            errfilecontents STRING,
+            errfilename STRING UNIQUE NOT NULL,
+            outfilename STRING UNIQUE NOT NULL
+        );
+        """)
+
   # Commit changes
 
     conn.commit()
@@ -171,35 +187,66 @@ def initDB(conn):
 ###
 
 def readXML(filename):
+
     xmltext = ""
     with open(filename, "r") as xmlfile:
         xmltext = "".join(xmlfile.readlines()).strip()
 
+    errfilename = filename[:-8] + "-err.xml"
+    errtext = None
+    tree = None
+
     if len(xmltext) == 0:
-      # Now we need to check the error file to see what happened. Notice that
-      # the entire rest of this code block is a kludge.
-        errfilename = filename[:-8] + "-err.xml"
         with open(errfilename, "r") as errfile:
             errtext = "".join(errfile.readlines()).strip()
-            #print errtext
-        xmltext = "<placeholder>so the rest of the program runs</placeholder>"
-    return xmltext
+    else:
+        tree = ElementTree.fromstring(xmltext)
+
+    return {"errtext": errtext, "tree": tree}
 
 ###
 
 def showbfImport(conn, data_dir):
 
+    c = conn.cursor()
+
+    query = """
+        SELECT outfilename FROM files_showbf;
+        """
+
+    outfilenames = []
+    for row in c.execute(query):
+        outfilenames.append(row["outfilename"])
+
     showbf_dir = os.path.join(data_dir, "showbf")
 
     for filename in os.listdir(showbf_dir):
-        if filename.endswith("-out.xml"):
+        if filename.endswith("-out.xml") and (filename not in outfilenames):
             abspath = os.path.join(showbf_dir, filename)
-            xmltext = readXML(abspath)
-            showbfXMLtoSQL(xmltext, conn)
+            obj = readXML(abspath)
+            if obj["tree"] is None:
+                c.execute("""
+                    INSERT INTO files_showbf (
+                        errfilecontents,
+                        errfilename,
+                        outfilename
+                    ) VALUES (?, ?, ?);
+                    """, (obj["errtext"], filename[:-8] + "-err.xml", filename))
+            else:
+                c.execute("""
+                    INSERT INTO files_showbf (
+                        errfilecontents,
+                        errfilename,
+                        outfilename
+                    ) VALUES (?, ?, ?);
+                    """, (obj["errtext"], filename[:-8] + "-err.xml", filename))
+                showbfXMLtoSQL(obj["tree"], conn)
+
+    conn.commit()
 
 ###
 
-def showbfXMLtoSQL(text, conn):
+def showbfXMLtoSQL(root, conn):
 
     c = conn.cursor()
 
@@ -207,8 +254,6 @@ def showbfXMLtoSQL(text, conn):
         "meta": {},
         "partitions": {}
     }
-
-    root = ElementTree.fromstring(text)
 
     for elem in root:
 
@@ -249,17 +294,45 @@ def showbfXMLtoSQL(text, conn):
 
 def showqImport(conn, data_dir):
 
+    c = conn.cursor()
+
+    query = """
+        SELECT outfilename FROM files_showq;
+        """
+
+    outfilenames = []
+    for row in c.execute(query):
+        outfilenames.append(row["outfilename"])
+
     showq_dir = os.path.join(data_dir, "showq")
 
     for filename in os.listdir(showq_dir):
-        if filename.endswith("-out.xml"):
+        if filename.endswith("-out.xml") and (filename not in outfilenames):
             abspath = os.path.join(showq_dir, filename)
-            xmltext = readXML(abspath)
-            showqXMLtoSQL(xmltext, conn)
+            obj = readXML(abspath)
+            if obj["tree"] is None:
+                c.execute("""
+                    INSERT INTO files_showq (
+                        errfilecontents,
+                        errfilename,
+                        outfilename
+                    ) VALUES (?, ?, ?);
+                    """, (obj["errtext"], filename[:-8] + "-err.xml", filename))
+            else:
+                c.execute("""
+                    INSERT INTO files_showq (
+                        errfilecontents,
+                        errfilename,
+                        outfilename
+                    ) VALUES (?, ?, ?);
+                    """, (obj["errtext"], filename[:-8] + "-err.xml", filename))
+                showqXMLtoSQL(obj["tree"], conn)
+
+    conn.commit()
 
 ###
 
-def showqXMLtoSQL(text, conn):
+def showqXMLtoSQL(root, conn):
 
     c = conn.cursor()
 
@@ -271,8 +344,6 @@ def showqXMLtoSQL(text, conn):
         },
         "meta": {}
     }
-
-    root = ElementTree.fromstring(text)
 
     for elem in root:
 
@@ -466,18 +537,24 @@ def main():
 
     dbfilename = os.path.join(data_dir, "moab-data.sqlite")
 
-    conn = sqlite3.connect(dbfilename)
+    connection = sqlite3.connect(dbfilename)
 
-    initDB(conn)
+  # Enable users to access columns by name instead of by index.
+
+    connection.row_factory = sqlite3.Row
+
+  # Create the database itself, if it doesn't exist.
+
+    initDB(connection)
 
   # Start populating the database from the raw XML files.
 
-    showbfImport(conn, data_dir)
-    showqImport(conn, data_dir)
+    showbfImport(connection, data_dir)
+    showqImport(connection, data_dir)
 
   # When we are finished, close the connection to the database.
 
-    conn.close()
+    connection.close()
 
 ###
 
