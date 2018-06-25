@@ -1,20 +1,17 @@
 #-  Python 2.7 source code
 
-#-  visualization-template.py ~~
+#-  plot-total-procs-by-time.py ~~
 #
-#   This program is just a template with some useful examples shown, so that
-#   it's easy to start modifying the program in order to explore the data. It
-#   will not run correctly on OLCF machines unless the appropriate module has
-#   been loaded beforehand:
+#   This program plots the total processors in use by CSC108 backfill by time.
+#   As always, this program may or may not run on OLCF machines until you have
+#   invoked
 #
 #       $ module load python_anaconda
 #
-#                                                       ~~ (c) SRW, 22 Jun 2018
+#                                                       ~~ (c) SRW, 25 Jun 2018
 #                                                   ~~ last updated 25 Jun 2018
 
 from datetime import datetime
-
-import matplotlib
 import matplotlib.pyplot as pyplot
 import os
 import sqlite3
@@ -50,7 +47,7 @@ def analyze(connection):
     ax.set(ylabel="Total Processors", title="CSC108 Backfill Usage")
     ax.grid()
 
-    fig.savefig("csc108-backfill-usage.png")
+    fig.savefig("csc108-total-procs-by-time.png")
 
 ###
 
