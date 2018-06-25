@@ -11,9 +11,10 @@
 #   control -- always execute your commits manually!
 #
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 19 Jun 2018
+#                                                   ~~ last updated 25 Jun 2018
 
-#-  Experimental data
+#-  Experimental data and plots
+*.png
 *.sqlite
 *.xml
 
