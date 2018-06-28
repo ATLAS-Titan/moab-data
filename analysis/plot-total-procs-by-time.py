@@ -9,7 +9,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 25 Jun 2018
-#                                                   ~~ last updated 25 Jun 2018
+#                                                   ~~ last updated 28 Jun 2018
 
 from datetime import datetime
 import matplotlib.pyplot as pyplot
@@ -23,10 +23,10 @@ def analyze(connection):
     cursor = connection.cursor()
 
     query = """
-        SELECT time, sum(ReqProcs) AS procs
+        SELECT SampleTime, sum(ReqProcs) AS procs
             FROM showq_active
-            WHERE Account="CSC108" AND User_="doleynik"
-            GROUP BY time;
+            WHERE Account="CSC108" AND User="doleynik"
+            GROUP BY SampleTime;
         """
 
     times = []
@@ -34,7 +34,7 @@ def analyze(connection):
     for row in cursor.execute(query):
         procs.append(row["procs"])
       # Need to convert Unix time (in seconds) into Python `datetime` object
-        times.append(datetime.utcfromtimestamp(row["time"]))
+        times.append(datetime.utcfromtimestamp(row["SampleTime"]))
 
     fig = pyplot.figure()
     ax = fig.add_subplot(111)

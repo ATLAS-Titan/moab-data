@@ -1,16 +1,20 @@
 #-  Python 2.6 source code
 
-#-  from-xml-to-sqlite.py ~~
+#-  fresh.py ~~
 #
 #   This program converts the raw XML files into a queryable SQL database
 #   using SQLite. Right now, this script is being tested for use on machines
 #   that are local to the data as well as machines that are local to the user.
 #
+#   This version now takes advantage of the UUIDs I used to name the files in
+#   order to sync data taken by `showbf` and `showq`, which may or may not have
+#   identical timestamps.
+#
 #   I used Python here with extensive inline SQL using heredocs because that's
 #   what the group has used elsewhere in the BigPanDA project as well.
 #
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 22 Jun 2018
+#                                                   ~~ last updated 28 Jun 2018
 
 import os
 import sqlite3
@@ -18,29 +22,168 @@ from xml.etree import ElementTree
 
 ###
 
-def initDB(conn):
+def findNewUUIDs(connection, data_dir):
 
-    c = conn.cursor()
+  # Given a `Connection` object and a "data_dir" string indicating the path to
+  # the data directory, this function finds newly collected XML files that have
+  # not been imported into SQLite yet. This function returns a list of UUIDs
+  # that can be used to generate the filenames that should be imported.
 
-    c.execute("""
+  # First, get a list of SampleIDs out of the SQLite database, so we know what
+  # has already been imported.
+
+    cursor = connection.cursor()
+
+    query = """
+        SELECT DISTINCT SampleID FROM sample_info;
+        """
+
+    sampleids = []
+    for row in cursor.execute(query):
+        sampleids.append(row["SampleID"])
+
+    connection.commit()
+
+  # Now, filter lists of the data directories to find UUIDs that have not been
+  # imported yet.
+
+    uuids = []
+
+    showbf_dir = os.path.join(data_dir, "showbf")
+    showq_dir = os.path.join(data_dir, "showq")
+
+    for filename in os.listdir(showbf_dir):
+        uuid = filename[:-8]
+        if (uuid not in sampleids) and (uuid not in uuids):
+            uuids.append(uuid)
+
+    for filename in os.listdir(showq_dir):
+        uuid = filename[:-8]
+        if (uuid not in sampleids) and (uuid not in uuids):
+            uuids.append(uuid)
+
+  # Return the list of UUIDs.
+
+    return uuids
+
+###
+
+def importBackfill(connection, data_dir, uuids):
+
+  # Given a `Connection` object and a "data_dir" string indicating the path to
+  # the data directory, this function imports the `showbf` data into SQLite.
+
+    cursor = connection.cursor()
+
+    showbf_dir = os.path.join(data_dir, "showbf")
+
+    for sampleid in uuids:
+
+        abspath = os.path.join(showbf_dir, sampleid + "-out.xml")
+        obj = readXML(abspath)
+
+      # A version of UPSERT that works with SQLite versions older than 3.24:
+        cursor.execute("""
+            UPDATE sample_info SET showbfError = ? WHERE SampleID = ?;
+        """, (obj["errtext"], sampleid))
+        cursor.execute("""
+            INSERT OR IGNORE INTO sample_info (SampleID, showbfError)
+                VALUES (?, ?);
+            """, (sampleid, obj["errtext"]))
+
+        connection.commit()
+
+        if obj["tree"] is not None:
+            showbfXMLtoSQL(connection, obj)
+
+    return
+
+###
+
+def importQueue(connection, data_dir, uuids):
+
+  # Given a `Connection` object and a "data_dir" string indicating the path to
+  # the data directory, this function imports the `showq` data into SQLite.
+
+    cursor = connection.cursor()
+
+    showq_dir = os.path.join(data_dir, "showq")
+
+    for sampleid in uuids:
+        abspath = os.path.join(showq_dir, sampleid + "-out.xml")
+        obj = readXML(abspath)
+
+      # A version of UPSERT that works with SQLite versions older than 3.24:
+        cursor.execute("""
+            UPDATE sample_info SET showqError = ? WHERE SampleID = ?;
+        """, (obj["errtext"], sampleid))
+        cursor.execute("""
+            INSERT OR IGNORE INTO sample_info (SampleID, showqError)
+                VALUES (?, ?);
+            """, (sampleid, obj["errtext"]))
+
+        connection.commit()
+
+        if obj["tree"] is not None:
+            showqXMLtoSQL(connection, obj)
+
+    return
+
+###
+
+def initializeDatabase(connection):
+
+  # Given a `Connection` object, this function constructs the tables and
+  # indexes for the SQLite3 database.
+
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS sample_info (
+            SampleID STRING PRIMARY KEY,
+            showbfError STRING,
+            showqError STRING
+        );
+        """)
+
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS showbf (
+
+         -- Metadata for our study
+
+            SampleID STRING NOT NULL,
+            SampleTime INTEGER NOT NULL,
+
+         -- Data
+
             duration INTEGER NOT NULL,
             index_ INTEGER NOT NULL,
             proccount INTEGER NOT NULL,
             nodecount INTEGER NOT NULL,
             reqid INTEGER NOT NULL,
             starttime INTEGER NOT NULL,
-            time INTEGER NOT NULL,
+
+         -- Other table-specific information
 
             CONSTRAINT unique_rows UNIQUE (
-                duration, index_, proccount, nodecount, reqid, starttime,
-                time
-            )
+                SampleID, SampleTime, duration, index_, proccount, nodecount,
+                reqid, starttime
+            ),
+
+            FOREIGN KEY(SampleID) REFERENCES sample_info(SampleID)
         );
         """)
 
-    c.execute("""
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS showq_active (
+
+         -- Metadata for our study
+
+            SampleID STRING NOT NULL,
+            SampleTime INTEGER NOT NULL,
+
+         -- Data
+
             Account STRING NOT NULL,
             AWDuration INTEGER,
             Class STRING NOT NULL,
@@ -65,20 +208,34 @@ def initDB(conn):
             StatPSUtl REAL NOT NULL,
             SubmissionTime TEXT NOT NULL,
             SuspendDuration INTEGER NOT NULL,
-            time INTEGER NOT NULL,
-            User_ STRING NOT NULL,
+            User STRING NOT NULL,
+
+         -- Other table-specific information
 
             CONSTRAINT unique_rows UNIQUE (
-                Account, Class, DRMJID, GJID, Group_, JobID, JobName, QOS,
-                ReqAWDuration, ReqProcs, RunPriority, StartPriority, StartTime,
-                State, StatPSDed, StatPSUtl, SubmissionTime, SuspendDuration,
-                time, User_
-            )
+
+             -- This can probably simplify to SampleID, SampleTime, JobID ...
+
+                SampleID, SampleTime, Account, Class, DRMJID, GJID, Group_,
+                JobID, JobName, QOS, ReqAWDuration, ReqProcs, RunPriority,
+                StartPriority, StartTime, State, StatPSDed, StatPSUtl,
+                SubmissionTime, SuspendDuration, User
+            ),
+
+            FOREIGN KEY(SampleID) REFERENCES sample_info(SampleID)
         )
         """)
 
-    c.execute("""
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS showq_blocked (
+
+         -- Metadata for our study
+
+            SampleID STRING NOT NULL,
+            SampleTime INTEGER NOT NULL,
+
+         -- Data
+
             Account STRING NOT NULL,
             Class STRING NOT NULL,
             DRMJID INTEGER NOT NULL,
@@ -95,19 +252,35 @@ def initDB(conn):
             State STRING NOT NULL,
             SubmissionTime INTEGER NOT NULL,
             SuspendDuration INTEGER NOT NULL,
-            time INTEGER NOT NULL,
-            User_ STRING NOT NULL,
+            User STRING NOT NULL,
+
+
+         -- Other table-specific information
 
             CONSTRAINT unique_rows UNIQUE (
-                Account, Class, DRMJID, GJID, Group_, JobID, JobName, QOS,
-                ReqAWDuration, ReqProcs, StartPriority, StartTime, State,
-                SubmissionTime, SuspendDuration, time, User_
-            )
+
+             -- This can probably simplify to SampleID, SampleTime, JobID ...
+
+                SampleID, SampleTime, Account, Class, DRMJID, GJID, Group_,
+                JobID, JobName, QOS, ReqAWDuration, ReqProcs, StartPriority,
+                StartTime, State, SubmissionTime, SuspendDuration, User
+
+            ),
+
+            FOREIGN KEY(SampleID) REFERENCES sample_info(SampleID)
         )
         """)
 
-    c.execute("""
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS showq_eligible (
+
+         -- Metadata for our study
+
+            SampleID STRING NOT NULL,
+            SampleTime INTEGER NOT NULL,
+
+         -- Data
+
             Account STRING NOT NULL,
             Class STRING NOT NULL,
             DRMJID INTEGER NOT NULL,
@@ -125,19 +298,34 @@ def initDB(conn):
             State STRING NOT NULL,
             SubmissionTime INTEGER NOT NULL,
             SuspendDuration INTEGER NOT NULL,
-            time INTEGER NOT NULL,
-            User_ STRING NOT NULL,
+            User STRING NOT NULL,
+
+         -- Other table-specific information
 
             CONSTRAINT unique_rows UNIQUE (
-                Account, Class, DRMJID, GJID, Group_, JobID, JobName, QOS,
-                ReqAWDuration, ReqProcs, StartPriority, StartTime, State,
-                SubmissionTime, SuspendDuration, time, User_
-            )
+
+             -- This can probably simplify to SampleID, SampleTime, JobID ...
+
+                SampleID, SampleTime, Account, Class, DRMJID, GJID, Group_,
+                JobID, JobName, QOS, ReqAWDuration, ReqProcs, StartPriority,
+                StartTime, State, SubmissionTime, SuspendDuration, User
+
+            ),
+
+            FOREIGN KEY(SampleID) REFERENCES sample_info(SampleID)
         )
         """)
 
-    c.execute("""
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS showq_meta (
+
+         -- Metadata for our study
+
+            SampleID STRING NOT NULL,
+            SampleTime INTEGER NOT NULL,
+
+         -- Data
+
             LocalActiveNodes INTEGER NOT NULL,
             LocalAllocProcs INTEGER NOT NULL,
             LocalConfigNodes INTEGER NOT NULL,
@@ -152,47 +340,111 @@ def initDB(conn):
             RemoteIdleProcs INTEGER NOT NULL,
             RemoteUpNodes INTEGER NOT NULL,
             RemoteUpProcs INTEGER NOT NULL,
-            time INTEGER NOT NULL,
+
+         -- Other table-specific information
 
             CONSTRAINT unique_rows UNIQUE (
-                LocalActiveNodes, LocalAllocProcs, LocalConfigNodes,
-                LocalIdleNodes, LocalIdleProcs, LocalUpNodes, LocalUpProcs,
-                RemoteActiveNodes, RemoteAllocProcs, RemoteConfigNodes,
-                RemoteIdleNodes, RemoteIdleProcs, RemoteUpNodes,
-                RemoteUpProcs, time
-            )
+
+             -- This can probably simplify to SampleID, SampleTime
+
+                SampleID, SampleTime, LocalActiveNodes, LocalAllocProcs,
+                LocalConfigNodes, LocalIdleNodes, LocalIdleProcs, LocalUpNodes,
+                LocalUpProcs, RemoteActiveNodes, RemoteAllocProcs,
+                RemoteConfigNodes, RemoteIdleNodes, RemoteIdleProcs,
+                RemoteUpNodes, RemoteUpProcs
+
+            ),
+
+            FOREIGN KEY(SampleID) REFERENCES sample_info(SampleID)
         )
-        """)
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS files_showbf (
-            errfilecontents STRING,
-            errfilename STRING UNIQUE NOT NULL,
-            outfilename STRING UNIQUE NOT NULL
-        );
-        """)
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS files_showq (
-            errfilecontents STRING,
-            errfilename STRING UNIQUE NOT NULL,
-            outfilename STRING UNIQUE NOT NULL
-        );
         """)
 
   # Commit changes
 
-    conn.commit()
+    connection.commit()
+
+    return
 
 ###
 
-def readXML(filename):
+def main():
+
+  # This is the first function that will execute.
+
+  # Store current working directory.
+
+    cwd = os.getcwd()
+
+  # Find the data directory, where this script is running remotely at OLCF and
+  # locally on a personal laptop, for example.
+
+    if os.path.isdir("/lustre/atlas/proj-shared/csc108/data/moab/"):
+        data_dir = "/lustre/atlas/proj-shared/csc108/data/moab/"
+    elif os.path.isdir(os.path.join(cwd, "moab")):
+        data_dir = os.path.join(cwd, "moab")
+    else:
+        raise "Data directory not found."
+
+  # Create the database file in the data directory and connect Python to it.
+
+    dbfilename = os.path.join(data_dir, "moab-data.sqlite")
+
+    connection = sqlite3.connect(dbfilename)
+
+  # Enable users to access columns by name instead of by index.
+
+    connection.row_factory = sqlite3.Row
+
+  # Create the database itself, if it doesn't exist.
+
+    initializeDatabase(connection)
+
+  # Filter directories to find the UUIDs (SampleIDs) of newly collected data
+  # that needs to be imported.
+
+    uuids = findNewUUIDs(connection, data_dir)
+
+  # Start populating the database from the raw XML files.
+
+    importBackfill(connection, data_dir, uuids)
+    importQueue(connection, data_dir, uuids)
+
+  # When we are finished, close the connection to the database.
+
+    connection.close()
+
+    return
+
+###
+
+def readXML(outfilename):
+
+  # Given a string "outfilename", this function returns a dictionary containing
+  # the file's SampleID, associated error information about when it was
+  # collected, and an `ElementTree` object if the data were collected without
+  # errors.
+
+  # Extract the UUID, which is the base name without "-out.xml".
+    uuid = os.path.basename(outfilename)[:-8]
+
+  # The XML files are small (typically < 250K) so it's safe to slurp them.
+    if os.path.isfile(outfilename) is False:
+        return {
+            "errtext": "No output file found",
+            "SampleID": uuid,
+            "tree": None
+        }
 
     xmltext = ""
-    with open(filename, "r") as xmlfile:
+    with open(outfilename, "r") as xmlfile:
         xmltext = "".join(xmlfile.readlines()).strip()
 
-    errfilename = filename[:-8] + "-err.xml"
+  # Now, prepare default return values and try to parse the XML content. Note
+  # that we do not use the UUID to construct the "errfilename". This is because
+  # "errfilename" may be an absolute path, depending on if "outfilename" was an
+  # absolute path.
+
+    errfilename = outfilename[:-8] + "-err.xml"
     errtext = None
     tree = None
 
@@ -202,58 +454,26 @@ def readXML(filename):
     else:
         tree = ElementTree.fromstring(xmltext)
 
-    return {"errtext": errtext, "tree": tree}
+    return {
+        "errtext": errtext,
+        "SampleID": uuid,
+        "tree": tree
+    }
 
 ###
 
-def showbfImport(conn, data_dir):
+def showbfXMLtoSQL(connection, obj):
 
-    c = conn.cursor()
-
-    query = """
-        SELECT outfilename FROM files_showbf;
-        """
-
-    outfilenames = []
-    for row in c.execute(query):
-        outfilenames.append(row["outfilename"])
-
-    showbf_dir = os.path.join(data_dir, "showbf")
-
-    for filename in os.listdir(showbf_dir):
-        if filename.endswith("-out.xml") and (filename not in outfilenames):
-            abspath = os.path.join(showbf_dir, filename)
-            obj = readXML(abspath)
-            if obj["tree"] is None:
-                c.execute("""
-                    INSERT INTO files_showbf (
-                        errfilecontents,
-                        errfilename,
-                        outfilename
-                    ) VALUES (?, ?, ?);
-                    """, (obj["errtext"], filename[:-8] + "-err.xml", filename))
-            else:
-                c.execute("""
-                    INSERT INTO files_showbf (
-                        errfilecontents,
-                        errfilename,
-                        outfilename
-                    ) VALUES (?, ?, ?);
-                    """, (obj["errtext"], filename[:-8] + "-err.xml", filename))
-                showbfXMLtoSQL(obj["tree"], conn)
-
-    conn.commit()
-
-###
-
-def showbfXMLtoSQL(root, conn):
-
-    c = conn.cursor()
+    cursor = connection.cursor()
 
     data = {
         "meta": {},
         "partitions": {}
     }
+
+    root = obj["tree"]
+
+    sampleid = obj["SampleID"]
 
     for elem in root:
 
@@ -276,65 +496,28 @@ def showbfXMLtoSQL(root, conn):
     time = data["meta"]["time"]
     for key in data["partitions"]:
         for each in data["partitions"][key]:
-            c.execute("""
+            cursor.execute("""
                 INSERT OR IGNORE INTO showbf (
-                    duration, index_, proccount, nodecount, reqid,
-                    starttime, time
+                    SampleID, SampleTime, duration, index_, proccount,
+                    nodecount, reqid, starttime
                 ) VALUES (
-                    ?, ?, ?, ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?, ?, ?
                 )
-                """, (each["duration"], each["index"], each["proccount"],
-                each["nodecount"], each["reqid"], each["starttime"], time))
+                """, (sampleid, time, each["duration"], each["index"],
+                each["proccount"], each["nodecount"], each["reqid"],
+                each["starttime"]))
 
-  # Committing changes
+  # Commit changes
 
-    conn.commit()
+    connection.commit()
 
-###
-
-def showqImport(conn, data_dir):
-
-    c = conn.cursor()
-
-    query = """
-        SELECT outfilename FROM files_showq;
-        """
-
-    outfilenames = []
-    for row in c.execute(query):
-        outfilenames.append(row["outfilename"])
-
-    showq_dir = os.path.join(data_dir, "showq")
-
-    for filename in os.listdir(showq_dir):
-        if filename.endswith("-out.xml") and (filename not in outfilenames):
-            abspath = os.path.join(showq_dir, filename)
-            obj = readXML(abspath)
-            if obj["tree"] is None:
-                c.execute("""
-                    INSERT INTO files_showq (
-                        errfilecontents,
-                        errfilename,
-                        outfilename
-                    ) VALUES (?, ?, ?);
-                    """, (obj["errtext"], filename[:-8] + "-err.xml", filename))
-            else:
-                c.execute("""
-                    INSERT INTO files_showq (
-                        errfilecontents,
-                        errfilename,
-                        outfilename
-                    ) VALUES (?, ?, ?);
-                    """, (obj["errtext"], filename[:-8] + "-err.xml", filename))
-                showqXMLtoSQL(obj["tree"], conn)
-
-    conn.commit()
+    return
 
 ###
 
-def showqXMLtoSQL(root, conn):
+def showqXMLtoSQL(connection, obj):
 
-    c = conn.cursor()
+    cursor = connection.cursor()
 
     data = {
         "jobs": {
@@ -344,6 +527,10 @@ def showqXMLtoSQL(root, conn):
         },
         "meta": {}
     }
+
+    root = obj["tree"]
+
+    sampleid = obj["SampleID"]
 
     for elem in root:
 
@@ -395,29 +582,29 @@ def showqXMLtoSQL(root, conn):
             else:
                 vals[field] = None
 
-        c.execute("""
+        cursor.execute("""
             INSERT OR IGNORE INTO showq_active (
-                Account, AWDuration, Class, DRMJID, EEDuration,
-                GJID, Group_, JobID, JobName, MasterHost, PAL,
+                SampleID, SampleTime, Account, AWDuration, Class, DRMJID,
+                EEDuration, GJID, Group_, JobID, JobName, MasterHost, PAL,
                 QOS, ReqAWDuration, ReqNodes, ReqProcs, RsvStartTime,
                 RunPriority, StartPriority, StartTime, State,
                 StatPSDed, StatPSUtl, SubmissionTime, SuspendDuration,
-                time, User_
+                User
             ) VALUES (
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?
             )
-            """, (vals["Account"], vals["AWDuration"], vals["Class"],
-                vals["DRMJID"], vals["EEDuration"], vals["GJID"],
-                vals["Group"], vals["JobID"], vals["JobName"],
+            """, (sampleid, time, vals["Account"], vals["AWDuration"],
+                vals["Class"], vals["DRMJID"], vals["EEDuration"],
+                vals["GJID"], vals["Group"], vals["JobID"], vals["JobName"],
                 vals["MasterHost"], vals["PAL"], vals["QOS"],
                 vals["ReqAWDuration"], vals["ReqNodes"], vals["ReqProcs"],
                 vals["RsvStartTime"], vals["RunPriority"],
                 vals["StartPriority"], vals["StartTime"], vals["State"],
                 vals["StatPSDed"], vals["StatPSUtl"], vals["SubmissionTime"],
-                vals["SuspendDuration"], time, vals["User"]))
+                vals["SuspendDuration"], vals["User"]))
 
-    conn.commit()
+    connection.commit()
 
   # Next, showq_blocked ...
 
@@ -436,22 +623,23 @@ def showqXMLtoSQL(root, conn):
             else:
                 vals[field] = None
 
-        c.execute("""
+        cursor.execute("""
             INSERT OR IGNORE INTO showq_blocked (
-                Account, Class, DRMJID, EEDuration, GJID, Group_, JobID,
-                JobName, QOS, ReqAWDuration, ReqProcs, StartPriority,
-                StartTime, State, SubmissionTime, SuspendDuration, time, User_
+                SampleID, SampleTime, Account, Class, DRMJID, EEDuration, GJID,
+                Group_, JobID, JobName, QOS, ReqAWDuration, ReqProcs,
+                StartPriority, StartTime, State, SubmissionTime,
+                SuspendDuration, User
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
-            """, (vals["Account"], vals["Class"], vals["DRMJID"],
-                vals["EEDuration"], vals["GJID"], vals["Group"], vals["JobID"],
-                vals["JobName"], vals["QOS"], vals["ReqAWDuration"],
-                vals["ReqProcs"], vals["StartPriority"], vals["StartTime"],
-                vals["State"], vals["SubmissionTime"], vals["SuspendDuration"],
-                time, vals["User"]))
+            """, (sampleid, time, vals["Account"], vals["Class"],
+                vals["DRMJID"], vals["EEDuration"], vals["GJID"],
+                vals["Group"], vals["JobID"], vals["JobName"], vals["QOS"],
+                vals["ReqAWDuration"], vals["ReqProcs"], vals["StartPriority"],
+                vals["StartTime"], vals["State"], vals["SubmissionTime"],
+                vals["SuspendDuration"], vals["User"]))
 
-    conn.commit()
+    connection.commit()
 
   # Next, showq_eligible ...
 
@@ -471,90 +659,52 @@ def showqXMLtoSQL(root, conn):
             else:
                 vals[field] = None
 
-        c.execute("""
+        cursor.execute("""
             INSERT OR IGNORE INTO showq_eligible (
-                Account, Class, DRMJID, EEDuration, GJID, Group_, JobID,
-                JobName, QOS, ReqAWDuration, ReqProcs, RsvStartTime,
-                StartPriority, StartTime, State, SubmissionTime,
-                SuspendDuration, time, User_
+                SampleID, SampleTime, Account, Class, DRMJID, EEDuration, GJID,
+                Group_, JobID, JobName, QOS, ReqAWDuration, ReqProcs,
+                RsvStartTime, StartPriority, StartTime, State, SubmissionTime,
+                SuspendDuration, User
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
-            """, (vals["Account"], vals["Class"], vals["DRMJID"],
-                vals["EEDuration"], vals["GJID"], vals["Group"], vals["JobID"],
-                vals["JobName"], vals["QOS"], vals["ReqAWDuration"],
-                vals["ReqProcs"], vals["RsvStartTime"], vals["StartPriority"],
-                vals["StartTime"], vals["State"], vals["SubmissionTime"],
-                vals["SuspendDuration"], time, vals["User"]))
+            """, (sampleid, time, vals["Account"], vals["Class"],
+                vals["DRMJID"], vals["EEDuration"], vals["GJID"],
+                vals["Group"], vals["JobID"], vals["JobName"], vals["QOS"],
+                vals["ReqAWDuration"], vals["ReqProcs"], vals["RsvStartTime"],
+                vals["StartPriority"], vals["StartTime"], vals["State"],
+                vals["SubmissionTime"], vals["SuspendDuration"], vals["User"]))
 
-    conn.commit()
+    connection.commit()
 
   # Finally, showq_meta.
 
     vals = data["meta"]
 
-    c.execute("""
+    cursor.execute("""
         INSERT OR IGNORE INTO showq_meta (
-            LocalActiveNodes, LocalAllocProcs, LocalConfigNodes,
-            LocalIdleNodes, LocalIdleProcs, LocalUpNodes, LocalUpProcs,
-            RemoteActiveNodes, RemoteAllocProcs, RemoteConfigNodes,
-            RemoteIdleNodes, RemoteIdleProcs, RemoteUpNodes, RemoteUpProcs,
-            time
+            SampleID, SampleTime, LocalActiveNodes, LocalAllocProcs,
+            LocalConfigNodes, LocalIdleNodes, LocalIdleProcs, LocalUpNodes,
+            LocalUpProcs, RemoteActiveNodes, RemoteAllocProcs,
+            RemoteConfigNodes, RemoteIdleNodes, RemoteIdleProcs, RemoteUpNodes,
+            RemoteUpProcs
         ) VALUES (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         )
-        """, (vals["LocalActiveNodes"], vals["LocalAllocProcs"],
-        vals["LocalConfigNodes"], vals["LocalIdleNodes"],
-        vals["LocalIdleProcs"], vals["LocalUpNodes"], vals["LocalUpProcs"],
-        vals["RemoteActiveNodes"], vals["RemoteAllocProcs"],
-        vals["RemoteConfigNodes"], vals["RemoteIdleNodes"],
-        vals["RemoteIdleProcs"], vals["RemoteUpNodes"],
-        vals["RemoteUpProcs"], time))
+        """, (sampleid, time, vals["LocalActiveNodes"],
+            vals["LocalAllocProcs"], vals["LocalConfigNodes"],
+            vals["LocalIdleNodes"], vals["LocalIdleProcs"],
+            vals["LocalUpNodes"], vals["LocalUpProcs"],
+            vals["RemoteActiveNodes"], vals["RemoteAllocProcs"],
+            vals["RemoteConfigNodes"], vals["RemoteIdleNodes"],
+            vals["RemoteIdleProcs"], vals["RemoteUpNodes"],
+            vals["RemoteUpProcs"]))
 
-  # Committing changes
+  # Commit changes
 
-    conn.commit()
+    connection.commit()
 
-###
-
-def main():
-
-  # Store current working directory.
-
-    cwd = os.getcwd()
-
-  # Find the data directory, where this script is running remotely at OLCF and
-  # locally on a personal laptop, for example.
-
-    if os.path.isdir("/lustre/atlas/proj-shared/csc108/data/moab/"):
-        data_dir = "/lustre/atlas/proj-shared/csc108/data/moab/"
-    elif os.path.isdir(os.path.join(cwd, "moab")):
-        data_dir = os.path.join(cwd, "moab")
-    else:
-        raise "Data directory not found."
-
-  # Create the database file in the data directory and connect Python to it.
-
-    dbfilename = os.path.join(data_dir, "moab-data.sqlite")
-
-    connection = sqlite3.connect(dbfilename)
-
-  # Enable users to access columns by name instead of by index.
-
-    connection.row_factory = sqlite3.Row
-
-  # Create the database itself, if it doesn't exist.
-
-    initDB(connection)
-
-  # Start populating the database from the raw XML files.
-
-    showbfImport(connection, data_dir)
-    showqImport(connection, data_dir)
-
-  # When we are finished, close the connection to the database.
-
-    connection.close()
+    return
 
 ###
 

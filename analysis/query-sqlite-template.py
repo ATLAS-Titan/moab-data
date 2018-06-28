@@ -6,7 +6,7 @@
 #   it's easy to start modifying the program in order to explore the data.
 #
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 18 Jun 2018
+#                                                   ~~ last updated 28 Jun 2018
 
 import json
 import os
@@ -19,8 +19,8 @@ def analyze(connection):
     cursor = connection.cursor()
 
     query = """
-        SELECT COUNT(time) FROM showq_active
-            WHERE time > (strftime('%s','now') - 3*24*60*60);
+        SELECT COUNT(SampleID) FROM showq_meta
+            WHERE SampleTime > (strftime('%s','now') - 3*24*60*60);
         """
 
     for row in cursor.execute(query):

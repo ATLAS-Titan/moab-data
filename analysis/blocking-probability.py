@@ -12,7 +12,7 @@
 #   totally wrong.
 #
 #                                                       ~~ (c) SRW, 21 Jun 2018
-#                                                   ~~ last updated 21 Jun 2018
+#                                                   ~~ last updated 28 Jun 2018
 
 import os
 import sqlite3
@@ -30,20 +30,22 @@ def analyze(connection):
   # - ReqProcs: requested processors
 
     query = """
-        SELECT count(DISTINCT showq_eligible.time) AS n
+        SELECT count(DISTINCT showq_eligible.SampleTime) AS n
 
         FROM showq_eligible
 
         INNER JOIN (
-            SELECT time, sum(ReqProcs) AS procs
+            SELECT SampleTime, sum(ReqProcs) AS procs
                 FROM showq_active
-                WHERE Account="CSC108" AND User_="doleynik"
-                GROUP BY time
-        ) csc108 ON showq_eligible.time=csc108.time
+                WHERE Account="CSC108" AND User="doleynik"
+                GROUP BY SampleTime
+        ) csc108 ON showq_eligible.SampleTime=csc108.SampleTime
 
-        INNER JOIN showbf ON showbf.time = showq_eligible.time
+        INNER JOIN showbf ON
+            showbf.SampleTime = showq_eligible.SampleTime
 
-        INNER JOIN showq_meta ON showq_meta.time = showq_eligible.time
+        INNER JOIN showq_meta ON
+            showq_meta.SampleTime = showq_eligible.SampleTime
 
         WHERE
             showq_eligible.ReqAWDuration < showbf.duration
@@ -52,7 +54,7 @@ def analyze(connection):
          -- not take duration into account here ...
             showq_eligible.ReqProcs < (showbf.proccount + csc108.procs)
             AND
-            showbf.starttime = showbf.time
+            showbf.starttime = showbf.SampleTime
             AND
             showq_eligible.EEDuration > 0
         ;
@@ -65,7 +67,7 @@ def analyze(connection):
             num_blocked
 
     query = """
-        SELECT count(DISTINCT showq_eligible.time) AS n
+        SELECT count(DISTINCT showq_eligible.SampleTime) AS n
         FROM showq_eligible
         ;
         """

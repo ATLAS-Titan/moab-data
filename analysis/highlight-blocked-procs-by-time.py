@@ -11,7 +11,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 25 Jun 2018
-#                                                   ~~ last updated 25 Jun 2018
+#                                                   ~~ last updated 28 Jun 2018
 
 from datetime import datetime
 import matplotlib
@@ -27,22 +27,25 @@ def analyze(connection):
     cursor = connection.cursor()
 
     blocked_query = """
-        SELECT DISTINCT showq_eligible.time AS time, csc108.procs AS procs
+        SELECT DISTINCT showq_eligible.SampleTime AS time,
+                        csc108.procs AS procs
         FROM showq_eligible
         INNER JOIN (
-            SELECT time, sum(ReqProcs) AS procs
+            SELECT SampleTime, sum(ReqProcs) AS procs
                 FROM showq_active
-                WHERE Account="CSC108" AND User_="doleynik"
-                GROUP BY time
-        ) csc108 ON showq_eligible.time=csc108.time
-        INNER JOIN showbf ON showbf.time = showq_eligible.time
-        INNER JOIN showq_meta ON showq_meta.time = showq_eligible.time
+                WHERE Account="CSC108" AND User="doleynik"
+                GROUP BY SampleTime
+        ) csc108 ON showq_eligible.SampleTime=csc108.SampleTime
+        INNER JOIN showbf ON
+            showbf.SampleTime = showq_eligible.SampleTime
+        INNER JOIN showq_meta ON
+            showq_meta.SampleTime = showq_eligible.SampleTime
         WHERE
             showq_eligible.ReqAWDuration < showbf.duration
             AND
             showq_eligible.ReqProcs < (showbf.proccount + csc108.procs)
             AND
-            showbf.starttime = showbf.time
+            showbf.starttime = showbf.SampleTime
             AND
             showq_eligible.EEDuration > 0
         ;
@@ -66,19 +69,19 @@ def analyze(connection):
   # Now compute the rest of the results and add them to the figure in blue.
 
     all_query = """
-        SELECT time, sum(ReqProcs) AS procs
+        SELECT SampleTime, sum(ReqProcs) AS procs
             FROM showq_active
-            WHERE Account="CSC108" AND User_="doleynik"
-            GROUP BY time;
+            WHERE Account="CSC108" AND User="doleynik"
+            GROUP BY SampleTime;
         """
 
     procs = []
     times = []
     for row in cursor.execute(all_query):
       # Need to convert Unix time (in seconds) into Python `datetime` object
-        if row["time"] not in blocked_times:
+        if row["SampleTime"] not in blocked_times:
             procs.append(row["procs"])
-            times.append(datetime.utcfromtimestamp(row["time"]))
+            times.append(datetime.utcfromtimestamp(row["SampleTime"]))
 
     ax.plot_date(times, procs, linestyle="none", marker="o", color="blue")
 

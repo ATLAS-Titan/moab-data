@@ -5,7 +5,7 @@
 #   This program explores the "showq_meta" table on a very preliminary level.
 #
 #                                                       ~~ (c) SRW, 19 Jun 2018
-#                                                   ~~ last updated 19 Jun 2018
+#                                                   ~~ last updated 28 Jun 2018
 
 import os
 import sqlite3
@@ -41,7 +41,7 @@ def analyze(connection):
     fieldnames = row.keys()
 
     for field in fieldnames:
-        if field != "time":
+        if field not in ["SampleID", "SampleTime"]:
             compute_average(field)
 
 ###
