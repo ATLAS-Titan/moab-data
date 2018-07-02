@@ -11,7 +11,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 25 Jun 2018
-#                                                   ~~ last updated 28 Jun 2018
+#                                                   ~~ last updated 02 Jul 2018
 
 from datetime import datetime
 import matplotlib
@@ -65,7 +65,6 @@ def analyze(connection):
     ax = fig.add_subplot(111)
     ax.plot_date(times, procs, linestyle="none", marker="o", color="red")
 
-
   # Now compute the rest of the results and add them to the figure in blue.
 
     all_query = """
@@ -99,7 +98,10 @@ def analyze(connection):
     pyplot.legend(handles=[red_patch, blue_patch], bbox_to_anchor=(1, 1),
            bbox_transform=pyplot.gcf().transFigure)
 
-    fig.savefig("highlight-blocked-procs-by-time.png")
+
+  # Now, adjust the output format and save plot as an image file.
+
+    fig.savefig("highlight-blocked-procs-by-time.png", dpi = 300)
 
 ###
 
