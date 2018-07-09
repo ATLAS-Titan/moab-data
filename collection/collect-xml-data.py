@@ -11,7 +11,7 @@
 #   with subdirectories to store the XML files.
 #
 #                                                       ~~ (c) SRW, 06 Jun 2018
-#                                                   ~~ last updated 22 Jun 2018
+#                                                   ~~ last updated 09 Jul 2018
 
 import os
 import subprocess
@@ -68,7 +68,7 @@ def sample():
     showbf_err = os.path.join(showbf_dir, unique_hex + "-err.xml")
     with open(showbf_out, "wb") as out:
         with open(showbf_err, "wb") as err:
-            subprocess.Popen(["showbf", "--format=xml", "-p", "titan"], \
+            subprocess.Popen(["showbf", "--format=xml", "-p", "titan"],
                     stdout=out, stderr=err, env=env)
 
   # Capture stdout and stderr from "showq" as XML files. The flags used here
@@ -78,8 +78,25 @@ def sample():
     showq_err = os.path.join(showq_dir, unique_hex + "-err.xml")
     with open(showq_out, "wb") as out:
         with open(showq_err, "wb") as err:
-            subprocess.Popen(["showq", "--format=xml", "-p", "titan"], \
+            subprocess.Popen(["showq", "--format=xml", "-p", "titan"],
                     stdout=out, stderr=err, env=env)
+
+  # This part is experimental. There's nothing wrong with collecting data
+  # before it is known for certain that it will be needed, but for now, I
+  # will leave all of this as comments. Read more here:
+  #
+  #     http://docs.adaptivecomputing.com/maui/commands/mjobctl.php
+
+  # mjobctl_dir = "/lustre/atlas/proj-shared/csc108/data/moab/mjobctl"
+  # if not os.path.exists(mjobctl_dir):
+  #     os.makedirs(mjobctl_dir)
+  #
+  # mjobctl_out = os.path.join(mjobctl_dir, unique_hex + "-out.xml")
+  # mjobctl_err = os.path.join(mjobctl_dir, unique_hex + "-err.xml")
+  # with open(mjobctl_out, "wb") as out:
+  #     with open(mjobctl_err, "wb") as err:
+  #         subprocess.Popen(["mjobctl", "-q", "diag", "ALL", "--format=xml"],
+  #                 stdout=out, stderr=err, env=env)
 
 ###
 
