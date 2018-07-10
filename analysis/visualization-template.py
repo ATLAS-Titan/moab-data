@@ -10,7 +10,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 22 Jun 2018
-#                                                   ~~ last updated 28 Jun 2018
+#                                                   ~~ last updated 10 Jul 2018
 
 from datetime import datetime
 
@@ -29,7 +29,7 @@ def analyze(connection):
         SELECT SampleTime, sum(ReqProcs) AS procs
             FROM showq_active
             WHERE Account="CSC108" AND User="doleynik"
-            GROUP BY SampleTime;
+            GROUP BY SampleID;
         """
 
     times = []

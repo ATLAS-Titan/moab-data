@@ -8,7 +8,7 @@
 #   walltime duration and requested number of processors.
 #
 #                                                       ~~ (c) SRW, 21 Jun 2018
-#                                                   ~~ last updated 28 Jun 2018
+#                                                   ~~ last updated 10 Jul 2018
 
 import os
 import sqlite3
@@ -28,7 +28,8 @@ def analyze(connection):
     query = """
         SELECT count(DISTINCT showq_eligible.JobID) AS n
             FROM showq_eligible
-            INNER JOIN showbf ON showbf.SampleTime = showq_eligible.SampleTime
+            INNER JOIN showbf ON
+                showbf.SampleID = showq_eligible.SampleID
             WHERE
                 showq_eligible.ReqAWDuration < showbf.duration
                 AND

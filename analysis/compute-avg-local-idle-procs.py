@@ -2,7 +2,7 @@
 
 #-  compute-avg-local-idle-procs.py ~~
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 28 Jun 2018
+#                                                   ~~ last updated 20 Jul 2018
 
 import os
 import sqlite3
@@ -17,7 +17,7 @@ def analyze(connection):
 
     query = """
         SELECT LocalIdleProcs AS procs FROM showq_meta
-            GROUP BY SampleTime;
+            GROUP BY SampleID;
         """
 
     procs = []

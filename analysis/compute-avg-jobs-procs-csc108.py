@@ -2,7 +2,7 @@
 
 #-  compute-avg-jobs-procs-csc108.py ~~
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 28 Jun 2018
+#                                                   ~~ last updated 10 Jul 2018
 
 import os
 import sqlite3
@@ -16,7 +16,7 @@ def analyze(connection):
     query = """
         SELECT count(*) As Jobs, sum(ReqProcs) AS Procs FROM showq_active
             WHERE Account="CSC108" AND User="doleynik"
-            GROUP BY SampleTime;
+            GROUP BY SampleID;
         """
 
     jobs = []

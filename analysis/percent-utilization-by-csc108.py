@@ -8,7 +8,7 @@
 #   as a way to check that the numbers are coming out as expected.
 #
 #                                                       ~~ (c) SRW, 20 Jun 2018
-#                                                   ~~ last updated 28 Jun 2018
+#                                                   ~~ last updated 10 Jul 2018
 
 import json
 import os
@@ -30,9 +30,10 @@ def analyze(connection):
                 sum(showq_active.ReqProcs) AS procs,
                 showq_meta.LocalUpProcs AS total_procs
         FROM showq_active
-        INNER JOIN showq_meta ON showq_active.SampleTime=showq_meta.SampleTime
+        INNER JOIN showq_meta ON
+            showq_active.SampleID = showq_meta.SampleID
         WHERE showq_active.Account="CSC108" AND showq_active.User="doleynik"
-        GROUP BY showq_active.SampleTime;
+        GROUP BY showq_active.SampleID;
         """
 
     jobs = []

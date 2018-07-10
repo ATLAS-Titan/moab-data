@@ -6,7 +6,7 @@
 #   it's easy to start modifying the program in order to explore the data.
 #
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 28 Jun 2018
+#                                                   ~~ last updated 10 Jul 2018
 
 import json
 import os

@@ -10,7 +10,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 09 Jul 2018
-#                                                   ~~ last updated 09 Jul 2018
+#                                                   ~~ last updated 10 Jul 2018
 
 from datetime import datetime
 
@@ -36,7 +36,7 @@ def analyze(connection):
                 User="doleynik"
                 AND
                 SampleTime > {unix_start_of_month}
-            GROUP BY SampleTime;
+            GROUP BY SampleID;
         """.format(unix_start_of_month = int(start_of_month.strftime("%s")))
 
     procs = []

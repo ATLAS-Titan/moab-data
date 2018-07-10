@@ -11,7 +11,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 25 Jun 2018
-#                                                   ~~ last updated 02 Jul 2018
+#                                                   ~~ last updated 10 Jul 2018
 
 from datetime import datetime
 import matplotlib
@@ -27,19 +27,20 @@ def analyze(connection):
     cursor = connection.cursor()
 
     blocked_query = """
-        SELECT DISTINCT showq_eligible.SampleTime AS time,
+        SELECT DISTINCT showq_eligible.SampleID,
+                        showq_eligible.SampleTime AS time,
                         csc108.procs AS procs
         FROM showq_eligible
         INNER JOIN (
-            SELECT SampleTime, sum(ReqProcs) AS procs
+            SELECT SampleID, sum(ReqProcs) AS procs
                 FROM showq_active
                 WHERE Account="CSC108" AND User="doleynik"
-                GROUP BY SampleTime
-        ) csc108 ON showq_eligible.SampleTime=csc108.SampleTime
+                GROUP BY SampleID
+        ) csc108 ON showq_eligible.SampleID = csc108.SampleID
         INNER JOIN showbf ON
-            showbf.SampleTime = showq_eligible.SampleTime
-        INNER JOIN showq_meta ON
-            showq_meta.SampleTime = showq_eligible.SampleTime
+            showbf.SampleID = showq_eligible.SampleID
+        --INNER JOIN showq_meta ON
+        --    showq_meta.SampleID = showq_eligible.SampleID
         WHERE
             showq_eligible.ReqAWDuration < showbf.duration
             AND
@@ -71,7 +72,7 @@ def analyze(connection):
         SELECT SampleTime, sum(ReqProcs) AS procs
             FROM showq_active
             WHERE Account="CSC108" AND User="doleynik"
-            GROUP BY SampleTime;
+            GROUP BY SampleID;
         """
 
     procs = []

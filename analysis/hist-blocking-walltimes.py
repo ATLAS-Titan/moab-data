@@ -5,6 +5,8 @@
 #   This program plots a histogram representing the distribution of CSC108
 #   backfill jobs' walltimes which were running at the time of a "block".
 #
+#   NOTE: I think this program is computing incorrect results.
+#
 #   As always, remember to use the following on OLCF machines:
 #
 #       $ module load python_anaconda
@@ -34,20 +36,20 @@ def analyze(connection):
                         User = "doleynik"
             ) csc108
             WHERE
-                csc108.SampleTime IN (
-                    SELECT DISTINCT showq_eligible.SampleTime
+                csc108.SampleID IN (
+                    SELECT DISTINCT showq_eligible.SampleID
                         FROM showq_eligible
                         INNER JOIN (
-                            SELECT SampleTime, sum(ReqProcs) AS procs
+                            SELECT SampleID, sum(ReqProcs) AS procs
                                 FROM showq_active
                                 WHERE
                                     Account="CSC108"
                                     AND
                                     User="doleynik"
-                                GROUP BY SampleTime
-                        ) bp ON showq_eligible.SampleTime = bp.SampleTime
+                                GROUP BY SampleID
+                        ) bp ON showq_eligible.SampleID = bp.SampleID
                         INNER JOIN showbf ON
-                            showbf.SampleTime = showq_eligible.SampleTime
+                            showbf.SampleID = showq_eligible.SampleID
                         WHERE
                             showq_eligible.ReqAWDuration < showbf.duration
                             AND
