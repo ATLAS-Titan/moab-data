@@ -5,8 +5,6 @@
 #   This program plots a histogram representing the distribution of CSC108
 #   backfill jobs' walltimes which were running at the time of a "block".
 #
-#   NOTE: I think this program is computing incorrect results.
-#
 #   As always, remember to use the following on OLCF machines:
 #
 #       $ module load python_anaconda
@@ -25,10 +23,13 @@ def analyze(connection):
 
     cursor = connection.cursor()
 
+  # NOTE: I don't think that using `NOT IN` in place of `IN` will be sufficient
+  # to find the set complement, which is jobs which never blocked at any point.
+
     query = """
         SELECT DISTINCT csc108.JobID, csc108.ReqAWDuration AS walltime
             FROM (
-                SELECT SampleTime, JobID, ReqAWDuration
+                SELECT SampleID, JobID, ReqAWDuration
                     FROM showq_active
                     WHERE
                         Account = "CSC108"
