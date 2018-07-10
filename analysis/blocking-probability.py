@@ -11,8 +11,14 @@
 #   higher than expected. This value may indicate that I got the conditions
 #   totally wrong.
 #
+#   An edit to use SampleID to join tables instead of SampleTime resulted in an
+#   expected increase from 2268/6750 (0.34) to 3506/6751 (0.52). This was
+#   expected due to the undercounting that resulted when `showbf` and `showq`
+#   from the same sample returned different SampleTime values. The increase (by
+#   1) in SampleID versus SampleTime, however, is not yet explained.
+#
 #                                                       ~~ (c) SRW, 21 Jun 2018
-#                                                   ~~ last updated 28 Jun 2018
+#                                                   ~~ last updated 10 Jul 2018
 
 import os
 import sqlite3
@@ -30,22 +36,22 @@ def analyze(connection):
   # - ReqProcs: requested processors
 
     query = """
-        SELECT count(DISTINCT showq_eligible.SampleTime) AS n
+        SELECT count(DISTINCT showq_eligible.SampleID) AS n
 
         FROM showq_eligible
 
         INNER JOIN (
-            SELECT SampleTime, sum(ReqProcs) AS procs
+            SELECT SampleID, sum(ReqProcs) AS procs
                 FROM showq_active
                 WHERE Account="CSC108" AND User="doleynik"
-                GROUP BY SampleTime
-        ) csc108 ON showq_eligible.SampleTime=csc108.SampleTime
+                GROUP BY SampleID
+        ) csc108 ON showq_eligible.SampleID = csc108.SampleID
 
         INNER JOIN showbf ON
-            showbf.SampleTime = showq_eligible.SampleTime
+            showbf.SampleID = showq_eligible.SampleID
 
-        INNER JOIN showq_meta ON
-            showq_meta.SampleTime = showq_eligible.SampleTime
+        --INNER JOIN showq_meta ON
+        --    showq_meta.SampleID = showq_eligible.SampleID
 
         WHERE
             showq_eligible.ReqAWDuration < showbf.duration
@@ -67,7 +73,7 @@ def analyze(connection):
             num_blocked
 
     query = """
-        SELECT count(DISTINCT showq_eligible.SampleTime) AS n
+        SELECT count(DISTINCT showq_eligible.SampleID) AS n
         FROM showq_eligible
         ;
         """
