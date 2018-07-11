@@ -24,9 +24,6 @@ def analyze(connection):
 
     cursor = connection.cursor()
 
-  # NOTE: I don't think that using `NOT IN` in place of `IN` will be sufficient
-  # to find the set complement, which is jobs which never blocked at any point.
-
     query = """
         WITH
             csc108 AS (
@@ -81,7 +78,7 @@ def analyze(connection):
 
     pyplot.xlabel("Walltime (not sure about units)")
     pyplot.ylabel("Number of Jobs")
-    pyplot.title("Histogram of Blocking CSC108 Backfill Jobs' Walltimes")
+    pyplot.title("Histogram of Non-blocking CSC108 Backfill Jobs' Walltimes")
     pyplot.grid(True)
 
     current_script = os.path.basename(__file__)
