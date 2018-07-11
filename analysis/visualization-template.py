@@ -10,7 +10,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 22 Jun 2018
-#                                                   ~~ last updated 10 Jul 2018
+#                                                   ~~ last updated 11 Jul 2018
 
 from datetime import datetime
 
@@ -50,7 +50,8 @@ def analyze(connection):
     ax.set(ylabel="Total Processors", title="CSC108 Backfill Usage")
     ax.grid()
 
-    fig.savefig("csc108-backfill-usage.png")
+    current_script = os.path.basename(__file__)
+    fig.savefig(os.path.splitext(current_script)[0] + ".png", dpi = 300)
 
 ###
 

@@ -79,7 +79,7 @@ def analyze(connection):
     pyplot.grid(True)
 
     current_script = os.path.basename(__file__)
-    fig.savefig(os.path.splitext(current_script)[0] + ".png")
+    fig.savefig(os.path.splitext(current_script)[0] + ".png", dpi = 300)
 
 ###
 

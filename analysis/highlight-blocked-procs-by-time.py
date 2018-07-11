@@ -102,7 +102,8 @@ def analyze(connection):
 
   # Now, adjust the output format and save plot as an image file.
 
-    fig.savefig("highlight-blocked-procs-by-time.png", dpi = 300)
+    current_script = os.path.basename(__file__)
+    fig.savefig(os.path.splitext(current_script)[0] + ".png", dpi = 300)
 
 ###
 

@@ -10,7 +10,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 09 Jul 2018
-#                                                   ~~ last updated 10 Jul 2018
+#                                                   ~~ last updated 11 Jul 2018
 
 from datetime import datetime
 
@@ -60,7 +60,8 @@ def analyze(connection):
     pyplot.title("Histogram of CSC108 Backfill Processors This Month")
     pyplot.grid(True)
 
-    fig.savefig("hist-backfill-procs.png")
+    current_script = os.path.basename(__file__)
+    fig.savefig(os.path.splitext(current_script)[0] + ".png", dpi = 300)
 
 ###
 

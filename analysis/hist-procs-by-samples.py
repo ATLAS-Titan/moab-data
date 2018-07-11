@@ -11,7 +11,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 09 Jul 2018
-#                                                   ~~ last updated 10 Jul 2018
+#                                                   ~~ last updated 11 Jul 2018
 
 import math
 import matplotlib.pyplot as pyplot
@@ -52,7 +52,8 @@ def analyze(connection):
     pyplot.title("Histogram of CSC108 Backfill Processors")
     pyplot.grid(True)
 
-    fig.savefig("hist-procs-by-samples.png")
+    current_script = os.path.basename(__file__)
+    fig.savefig(os.path.splitext(current_script)[0] + ".png", dpi = 300)
 
 ###
 

@@ -10,7 +10,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 09 Jul 2018
-#                                                   ~~ last updated 09 Jul 2018
+#                                                   ~~ last updated 11 Jul 2018
 
 import math
 import matplotlib.pyplot as pyplot
@@ -50,7 +50,8 @@ def analyze(connection):
     pyplot.title("Histogram of CSC108 Backfill Jobs' Walltimes")
     pyplot.grid(True)
 
-    fig.savefig("hist-walltime-by-jobs.png")
+    current_script = os.path.basename(__file__)
+    fig.savefig(os.path.splitext(current_script)[0] + ".png", dpi = 300)
 
 ###
 
