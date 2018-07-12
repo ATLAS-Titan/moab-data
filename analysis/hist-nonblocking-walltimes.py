@@ -11,7 +11,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 11 Jul 2018
-#                                                   ~~ last updated 11 Jul 2018
+#                                                   ~~ last updated 12 Jul 2018
 
 import math
 import matplotlib.pyplot as pyplot
@@ -76,7 +76,7 @@ def analyze(connection):
 
     pyplot.hist(walltimes, 50, facecolor="b", alpha=0.75)
 
-    pyplot.xlabel("Walltime (not sure about units)")
+    pyplot.xlabel("Walltime (seconds)")
     pyplot.ylabel("Number of Jobs")
     pyplot.title("Histogram of Non-blocking CSC108 Backfill Jobs' Walltimes")
     pyplot.grid(True)
