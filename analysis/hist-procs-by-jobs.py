@@ -11,7 +11,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 09 Jul 2018
-#                                                   ~~ last updated 11 Jul 2018
+#                                                   ~~ last updated 12 Jul 2018
 
 import math
 import matplotlib.pyplot as pyplot
@@ -48,7 +48,7 @@ def analyze(connection):
 
     pyplot.xlabel("Processors (log-scaled)")
     pyplot.ylabel("Jobs")
-    pyplot.title("Histogram of CSC108 Backfill Processors")
+    pyplot.title("Histogram of CSC108 Backfill Jobs' Processors")
     pyplot.grid(True)
 
     current_script = os.path.basename(__file__)
