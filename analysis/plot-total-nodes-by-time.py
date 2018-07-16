@@ -1,19 +1,17 @@
 #-  Python 2.7 source code
 
-#-  hist-procs-by-samples.py ~~
+#-  plot-total-nodes-by-time.py ~~
 #
-#   This program plots a distribution of samples of log-scaled total processors
-#   in use by CSC108 backfill. Note that this is a distribution of *samples*,
-#   not a distribution of *jobs*.
-#
-#   As always, remember to use the following on OLCF machines:
+#   This program plots the total nodes in use by CSC108 backfill by time. As
+#   always, this program may or may not run on OLCF machines until you have
+#   invoked
 #
 #       $ module load python_anaconda
 #
-#                                                       ~~ (c) SRW, 09 Jul 2018
-#                                                   ~~ last updated 11 Jul 2018
+#                                                       ~~ (c) SRW, 25 Jun 2018
+#                                                   ~~ last updated 16 Jul 2018
 
-import math
+from datetime import datetime
 import matplotlib.pyplot as pyplot
 import os
 import sqlite3
@@ -25,32 +23,29 @@ def analyze(connection):
     cursor = connection.cursor()
 
     query = """
-        SELECT sum(ReqProcs) AS procs
+        SELECT SampleTime, sum(ReqProcs / 16) AS nodes
             FROM showq_active
             WHERE Account="CSC108" AND User="doleynik"
             GROUP BY SampleID;
         """
 
-    procs = []
+    times = []
+    nodes = []
     for row in cursor.execute(query):
-        procs.append(math.log10(row["procs"]))
+        nodes.append(row["nodes"])
+      # Need to convert Unix time (in seconds) into Python `datetime` object
+        times.append(datetime.utcfromtimestamp(row["SampleTime"]))
 
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
 
-    pyplot.hist(procs, 50, facecolor="b", alpha=0.75)
+    ax.plot_date(times, nodes, linestyle="none", marker="o")
 
-    locs, labels = pyplot.xticks()
-    new_labels = []
-    for a, b in zip(locs, labels):
-        new_labels.append(str(int(round(math.pow(10, a)))))
+  # Angle the x-axis labels so that the dates don't overlap so badly
+    pyplot.gcf().autofmt_xdate()
 
-    pyplot.xticks(locs, new_labels)
-
-    pyplot.xlabel("Processors (log-scaled)")
-    pyplot.ylabel("Samples")
-    pyplot.title("Histogram of CSC108 Backfill Processors")
-    pyplot.grid(True)
+    ax.set(ylabel="Total Nodes", title="CSC108 Backfill Usage")
+    ax.grid()
 
     current_script = os.path.basename(__file__)
     fig.savefig(os.path.splitext(current_script)[0] + ".png", dpi = 300)

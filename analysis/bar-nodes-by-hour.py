@@ -1,19 +1,19 @@
 #-  Python 2.7 source code
 
-#-  hist-procs-by-jobs.py ~~
+#-  bar-nodes-by-hour.py ~~
 #
-#   This program plots a distribution of jobs of log-scaled total processors
-#   in use by CSC108 backfill. Note that this is a distribution of *jobs*, not
-#   a distribution of *samples*.
+#   This self-contained program creates a bar plot that shows the average use
+#   of nodes by CSC108 backfill jobs by hour of the day, in the OLCF timezone.
 #
 #   As always, remember to use the following on OLCF machines:
 #
 #       $ module load python_anaconda
 #
-#                                                       ~~ (c) SRW, 09 Jul 2018
-#                                                   ~~ last updated 12 Jul 2018
+#                                                       ~~ (c) SRW, 12 Jul 2018
+#                                                   ~~ last updated 16 Jul 2018
 
-import math
+from datetime import datetime
+
 import matplotlib.pyplot as pyplot
 import os
 import sqlite3
@@ -25,31 +25,36 @@ def analyze(connection):
     cursor = connection.cursor()
 
     query = """
-        SELECT DISTINCT JobID, ReqProcs
+        SELECT  strftime("%H", SampleTime, "unixepoch", "localtime") AS hour,
+                avg(ReqProcs / 16) AS nodes
             FROM showq_active
-            WHERE Account="CSC108" AND User="doleynik"
+            WHERE
+                Account = "CSC108"
+                AND
+                User = "doleynik"
+            GROUP BY hour
+        ;
         """
 
-    procs = []
+    hours = []
+    nodes = []
     for row in cursor.execute(query):
-        procs.append(math.log10(row["ReqProcs"]))
+        hours.append(int(row["hour"]))
+        nodes.append(row["nodes"])
 
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
 
-    pyplot.hist(procs, 50, facecolor="b", alpha=0.75)
+    pyplot.bar(hours, nodes, align = "center")
+    pyplot.title("Node Usage by Time of Day for CSC108 Backfill")
 
-    locs, labels = pyplot.xticks()
-    new_labels = []
-    for a, b in zip(locs, labels):
-        new_labels.append(str(int(round(math.pow(10, a)))))
+    pyplot.xticks(range(0, 24, 3),
+        ("12 AM", "3 AM", "6 AM", "9 AM", "12 PM", "3 PM", "6 PM", "9 PM"))
 
-    pyplot.xticks(locs, new_labels)
+    pyplot.ylabel("Average Nodes")
 
-    pyplot.xlabel("Processors (log-scaled)")
-    pyplot.ylabel("Jobs")
-    pyplot.title("Histogram of CSC108 Backfill Jobs' Processors")
-    pyplot.grid(True)
+    ax.xaxis.grid(True)
+    pyplot.grid()
 
     current_script = os.path.basename(__file__)
     fig.savefig(os.path.splitext(current_script)[0] + ".png", dpi = 300)

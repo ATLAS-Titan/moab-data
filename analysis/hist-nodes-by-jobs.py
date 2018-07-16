@@ -1,18 +1,17 @@
 #-  Python 2.7 source code
 
-#-  histogram.py ~~
+#-  hist-nodes-by-jobs.py ~~
 #
-#   This program is a template for making histograms, and it contains a lot of
-#   extra stuff for date manipulation also, for when I need that later.
+#   This program plots a distribution of jobs of log-scaled total nodes
+#   in use by CSC108 backfill. Note that this is a distribution of *jobs*, not
+#   a distribution of *samples*.
 #
-#   As always, remember to run the following on OLCF machines:
+#   As always, remember to use the following on OLCF machines:
 #
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 09 Jul 2018
 #                                                   ~~ last updated 16 Jul 2018
-
-from datetime import datetime
 
 import math
 import matplotlib.pyplot as pyplot
@@ -25,19 +24,16 @@ def analyze(connection):
 
     cursor = connection.cursor()
 
-    start_of_month = datetime.today().replace(day=1, hour=0, minute=0)
+  # The relationship between nodes and processors is always 1:16. You can check
+  # this in the data set using
+  #
+  #     SELECT DISTINCT (ReqProcs % 16) FROM showq_active;
 
     query = """
-        SELECT sum(ReqProcs / 16) AS nodes
+        SELECT DISTINCT JobID, (ReqProcs / 16) AS nodes
             FROM showq_active
-            WHERE
-                Account="CSC108"
-                AND
-                User="doleynik"
-                AND
-                SampleTime > {unix_start_of_month}
-            GROUP BY SampleID;
-        """.format(unix_start_of_month = int(start_of_month.strftime("%s")))
+            WHERE Account="CSC108" AND User="doleynik"
+        """
 
     nodes = []
     for row in cursor.execute(query):
@@ -56,8 +52,8 @@ def analyze(connection):
     pyplot.xticks(locs, new_labels)
 
     pyplot.xlabel("Nodes (log-scaled)")
-    pyplot.ylabel("Samples")
-    pyplot.title("Histogram of CSC108 Backfill Nodes This Month")
+    pyplot.ylabel("Jobs")
+    pyplot.title("Histogram of CSC108 Backfill Jobs' Nodes")
     pyplot.grid(True)
 
     current_script = os.path.basename(__file__)

@@ -1,17 +1,16 @@
 #-  Python 2.7 source code
 
-#-  bar-procs-by-hour.py ~~
+#-  bar-nodes-by-day.py ~~
 #
 #   This self-contained program creates a bar plot that shows the average use
-#   of processors by CSC108 backfill jobs by hour of the day, in the OLCF
-#   timezone.
+#   of nodes by CSC108 backfill jobs by day of the week, in the OLCF timezone.
 #
 #   As always, remember to use the following on OLCF machines:
 #
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 12 Jul 2018
-#                                                   ~~ last updated 12 Jul 2018
+#                                                   ~~ last updated 16 Jul 2018
 
 from datetime import datetime
 
@@ -26,33 +25,32 @@ def analyze(connection):
     cursor = connection.cursor()
 
     query = """
-        SELECT  strftime("%H", SampleTime, "unixepoch", "localtime") AS hour,
-                avg(ReqProcs) AS procs
+        SELECT  strftime("%w", SampleTime, "unixepoch", "localtime") AS day,
+                avg(ReqProcs / 16) AS nodes
             FROM showq_active
             WHERE
                 Account = "CSC108"
                 AND
                 User = "doleynik"
-            GROUP BY hour
+            GROUP BY day
         ;
         """
 
-    hours = []
-    procs = []
+    days_of_week = []
+    nodes = []
     for row in cursor.execute(query):
-        hours.append(int(row["hour"]))
-        procs.append(row["procs"])
+        days_of_week.append(int(row["day"]))
+        nodes.append(row["nodes"])
 
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
 
-    pyplot.bar(hours, procs, align = "center")
-    pyplot.title("Processor Usage by Time of Day for CSC108 Backfill")
+    pyplot.bar(days_of_week, nodes, align = "center")
+    pyplot.title("Node Usage by Day of Week for CSC108 Backfill")
 
-    pyplot.xticks(range(0, 24, 3),
-        ("12 AM", "3 AM", "6 AM", "9 AM", "12 PM", "3 PM", "6 PM", "9 PM"))
+    pyplot.xticks(range(7), ("S", "M", "T", "W", "T", "F", "S"))
 
-    pyplot.ylabel("Average Processors")
+    pyplot.ylabel("Average Nodes")
 
     ax.xaxis.grid(True)
     pyplot.grid()

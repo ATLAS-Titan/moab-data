@@ -1,17 +1,17 @@
 #-  Python 2.7 source code
 
-#-  hist-nonblocking-procs.py ~~
+#-  hist-nonblocking-nodes.py ~~
 #
 #   This program plots a histogram representing the distribution of CSC108
-#   backfill jobs' total processors which ran, presumably to successful
-#   completion, without ever causing a "block".
+#   backfill jobs' total nodes which ran, presumably to successful completion,
+#   without ever causing a "block".
 #
 #   As always, remember to use the following on OLCF machines:
 #
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 11 Jul 2018
-#                                                   ~~ last updated 11 Jul 2018
+#                                                   ~~ last updated 16 Jul 2018
 
 import math
 import matplotlib.pyplot as pyplot
@@ -53,7 +53,7 @@ def analyze(connection):
                         AND
                         showq_eligible.EEDuration > 0
             )
-        SELECT DISTINCT JobID, ReqProcs AS procs
+        SELECT DISTINCT JobID, (ReqProcs / 16) AS nodes
             FROM csc108
             WHERE
                 JobID NOT IN (
@@ -67,14 +67,14 @@ def analyze(connection):
         ;
         """
 
-    procs = []
+    nodes = []
     for row in cursor.execute(query):
-        procs.append(math.log10(row["procs"]))
+        nodes.append(math.log10(row["nodes"]))
 
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
 
-    pyplot.hist(procs, 50, facecolor="b", alpha=0.75)
+    pyplot.hist(nodes, 50, facecolor="b", alpha=0.75)
 
     locs, labels = pyplot.xticks()
     new_labels = []
@@ -83,9 +83,9 @@ def analyze(connection):
 
     pyplot.xticks(locs, new_labels)
 
-    pyplot.xlabel("Processors (log-scaled)")
+    pyplot.xlabel("Nodes (log-scaled)")
     pyplot.ylabel("Jobs")
-    pyplot.title("Histogram of Non-blocking CSC108 Backfill Jobs' Processors")
+    pyplot.title("Histogram of Non-blocking CSC108 Backfill Jobs' Nodes")
     pyplot.grid(True)
 
     current_script = os.path.basename(__file__)

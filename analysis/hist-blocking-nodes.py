@@ -1,9 +1,9 @@
 #-  Python 2.7 source code
 
-#-  hist-blocking-procs.py ~~
+#-  hist-blocking-nodes.py ~~
 #
 #   This program plots a histogram representing the distribution of CSC108
-#   backfill jobs' total processors in use which were running at the time of a
+#   backfill jobs' total nodes in use which were running at the time of a
 #   "block".
 #
 #   As always, remember to use the following on OLCF machines:
@@ -11,7 +11,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 11 Jul 2018
-#                                                   ~~ last updated 11 Jul 2018
+#                                                   ~~ last updated 16 Jul 2018
 
 import math
 import matplotlib.pyplot as pyplot
@@ -28,7 +28,7 @@ def analyze(connection):
   # to find the set complement, which is jobs which never blocked at any point.
 
     query = """
-        SELECT DISTINCT csc108.JobID, csc108.ReqProcs AS procs
+        SELECT DISTINCT csc108.JobID, (csc108.ReqProcs / 16) AS nodes
             FROM (
                 SELECT SampleID, JobID, ReqProcs
                     FROM showq_active
@@ -65,14 +65,14 @@ def analyze(connection):
         ;
         """
 
-    procs = []
+    nodes = []
     for row in cursor.execute(query):
-        procs.append(math.log10(row["procs"]))
+        nodes.append(math.log10(row["nodes"]))
 
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
 
-    pyplot.hist(procs, 50, facecolor="b", alpha=0.75)
+    pyplot.hist(nodes, 50, facecolor="b", alpha=0.75)
 
     locs, labels = pyplot.xticks()
     new_labels = []

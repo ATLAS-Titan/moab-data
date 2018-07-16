@@ -1,17 +1,17 @@
 #-  Python 2.7 source code
 
-#-  highlight-blocked-procs-by-time.py ~~
+#-  highlight-blocked-nodes-by-time.py ~~
 #
-#   This program plots the total processors in use at a given sample time by
-#   CSC108 backfill, and it highlights the ones which are blocking other jobs
-#   by plotting them in red, while all other points are blue.
+#   This program plots the total nodes in use at a given sample time by CSC108
+#   backfill, and it highlights the ones which are blocking other jobs by
+#   plotting them in red, while all other points are blue.
 #
 #   As always, remember to run the following if using an OLCF machine:
 #
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 25 Jun 2018
-#                                                   ~~ last updated 10 Jul 2018
+#                                                   ~~ last updated 16 Jul 2018
 
 from datetime import datetime
 import matplotlib
@@ -29,7 +29,7 @@ def analyze(connection):
     blocked_query = """
         SELECT DISTINCT showq_eligible.SampleID,
                         showq_eligible.SampleTime AS time,
-                        csc108.procs AS procs
+                        (csc108.procs / 16) AS nodes
         FROM showq_eligible
         INNER JOIN (
             SELECT SampleID, sum(ReqProcs) AS procs
@@ -53,42 +53,42 @@ def analyze(connection):
         """
 
     blocked_times = []
-    procs = []
+    nodes = []
     times = []
     for row in cursor.execute(blocked_query):
         blocked_times.append(row["time"])
-        procs.append(row["procs"])
+        nodes.append(row["nodes"])
         times.append(datetime.utcfromtimestamp(row["time"]))
 
   # Now print these results in red real quick.
 
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
-    ax.plot_date(times, procs, linestyle="none", marker="o", color="red")
+    ax.plot_date(times, nodes, linestyle="none", marker="o", color="red")
 
   # Now compute the rest of the results and add them to the figure in blue.
 
     all_query = """
-        SELECT SampleTime, sum(ReqProcs) AS procs
+        SELECT SampleTime, sum(ReqProcs / 16) AS nodes
             FROM showq_active
             WHERE Account="CSC108" AND User="doleynik"
             GROUP BY SampleID;
         """
 
-    procs = []
+    nodes = []
     times = []
     for row in cursor.execute(all_query):
       # Need to convert Unix time (in seconds) into Python `datetime` object
         if row["SampleTime"] not in blocked_times:
-            procs.append(row["procs"])
+            nodes.append(row["nodes"])
             times.append(datetime.utcfromtimestamp(row["SampleTime"]))
 
-    ax.plot_date(times, procs, linestyle="none", marker="o", color="blue")
+    ax.plot_date(times, nodes, linestyle="none", marker="o", color="blue")
 
   # Angle the x-axis labels so that the dates don't overlap so badly
     pyplot.gcf().autofmt_xdate()
 
-    ax.set(ylabel="Total Processors", title="CSC108 Backfill Usage")
+    ax.set(ylabel="Total Nodes", title="CSC108 Backfill Usage")
     ax.grid()
 
   # Add a legend

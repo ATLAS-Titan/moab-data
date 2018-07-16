@@ -1,20 +1,23 @@
 #-  Python 2.7 source code
 
-#-  bar-procs-by-day.py ~~
+#-  plot-remaining-node-hours.py ~~
 #
-#   This self-contained program creates a bar plot that shows the average use
-#   of processors by CSC108 backfill jobs by day of the week, in the OLCF
-#   timezone.
+#   This self-contained program visualizes the live "node hours remaining" for
+#   CSC108 backfill jobs on Titan, which is defined as the sum of the products
+#   of the active jobs' requested processors with their remaining requested
+#   walltime. This is intended to provide an estimate for how many total
+#   resources have been set claimed by CSC108 at a given sample time.
 #
 #   As always, remember to use the following on OLCF machines:
 #
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 12 Jul 2018
-#                                                   ~~ last updated 12 Jul 2018
+#                                                   ~~ last updated 16 Jul 2018
 
 from datetime import datetime
 
+import matplotlib
 import matplotlib.pyplot as pyplot
 import os
 import sqlite3
@@ -26,35 +29,41 @@ def analyze(connection):
     cursor = connection.cursor()
 
     query = """
-        SELECT  strftime("%w", SampleTime, "unixepoch", "localtime") AS day,
-                avg(ReqProcs) AS procs
+        SELECT  SampleID,
+                SampleTime,
+                sum((ReqProcs / 16) *
+                    (StartTime + ReqAWDuration - SampleTime) / 3600.0) AS hrs
             FROM showq_active
             WHERE
                 Account = "CSC108"
                 AND
                 User = "doleynik"
-            GROUP BY day
-        ;
+            GROUP BY SampleID
         """
 
-    days_of_week = []
-    procs = []
+    times = []
+    node_hours = []
     for row in cursor.execute(query):
-        days_of_week.append(int(row["day"]))
-        procs.append(row["procs"])
+        node_hours.append(row["hrs"])
+      # Need to convert Unix time (in seconds) into Python `datetime` object
+        times.append(datetime.utcfromtimestamp(row["SampleTime"]))
+
+    #print "min node hours: %s" % min(node_hours)
+    #print "max node hours: %s" % max(node_hours)
+    #print "avg node hours: %s" % (sum(node_hours) / len(node_hours))
 
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
 
-    pyplot.bar(days_of_week, procs, align = "center")
-    pyplot.title("Processor Usage by Day of Week for CSC108 Backfill")
+    ax.plot_date(times, node_hours, linestyle="none", marker="o")
 
-    pyplot.xticks(range(7), ("S", "M", "T", "W", "T", "F", "S"))
+  # Angle the x-axis labels so that the dates don't overlap so badly
+    pyplot.gcf().autofmt_xdate()
 
-    pyplot.ylabel("Average Processors")
+    ax.grid()
 
-    ax.xaxis.grid(True)
-    pyplot.grid()
+    pyplot.title("CSC108 Backfill Remaining Allocated Node Hours")
+    pyplot.ylabel("Total Node Hours")
 
     current_script = os.path.basename(__file__)
     fig.savefig(os.path.splitext(current_script)[0] + ".png", dpi = 300)
