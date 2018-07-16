@@ -2,12 +2,8 @@
 
 #-  count-samples-with-csc108-backfill.py ~~
 #
-#   This self-contained program counts the number of samples with (and without)
-#   jobs that are being run by CSC108 in backfill mode on Titan.
-#
-#   As always, run the following on OLCF machines:
-#
-#       $ module load python_anaconda
+#   This program counts the number of samples with (and without) jobs that are
+#   being run by CSC108 in backfill mode on Titan.
 #
 #                                                       ~~ (c) SRW, 16 Jun 2018
 #                                                   ~~ last updated 16 Jul 2018

@@ -2,11 +2,11 @@
 
 #-  plot-remaining-node-hours.py ~~
 #
-#   This self-contained program visualizes the live "node hours remaining" for
-#   CSC108 backfill jobs on Titan, which is defined as the sum of the products
-#   of the active jobs' requested processors with their remaining requested
-#   walltime. This is intended to provide an estimate for how many total
-#   resources have been set claimed by CSC108 at a given sample time.
+#   This program visualizes the live "node hours remaining" for CSC108 backfill
+#   jobs on Titan, which is defined as the sum of the products of the active
+#   jobs' requested processors with their remaining requested walltime. This is
+#   intended to provide an estimate for how many total resources have been set
+#   claimed by CSC108 at a given sample time.
 #
 #   As always, remember to use the following on OLCF machines:
 #

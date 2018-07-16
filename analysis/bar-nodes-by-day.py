@@ -2,8 +2,8 @@
 
 #-  bar-nodes-by-day.py ~~
 #
-#   This self-contained program creates a bar plot that shows the average use
-#   of nodes by CSC108 backfill jobs by day of the week, in the OLCF timezone.
+#   This program creates a bar plot that shows the average use of nodes by
+#   CSC108 backfill jobs by day of the week, in the OLCF timezone.
 #
 #   As always, remember to use the following on OLCF machines:
 #
