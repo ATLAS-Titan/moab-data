@@ -18,7 +18,7 @@
 #   1) in SampleID versus SampleTime, however, is not yet explained.
 #
 #                                                       ~~ (c) SRW, 21 Jun 2018
-#                                                   ~~ last updated 10 Jul 2018
+#                                                   ~~ last updated 17 Jul 2018
 
 import os
 import sqlite3
@@ -69,7 +69,7 @@ def analyze(connection):
     num_blocked = 0
     for row in cursor.execute(query):
         num_blocked = row["n"]
-        print "Number of sample times in which > 1 job was blocked: %s" % \
+        print "Number of sample times in which >= 1 job was blocked: %s" % \
             num_blocked
 
     query = """
