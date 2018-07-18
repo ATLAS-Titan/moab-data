@@ -19,7 +19,6 @@
 #                                                       ~~ (c) SRW, 18 Jul 2018
 #                                                   ~~ last updated 18 Jul 2018
 
-import json
 import os
 import sqlite3
 
@@ -34,10 +33,10 @@ def analyze(connection):
             FROM (
                 SELECT
                     CASE
-                        WHEN ReqNodes IS NOT NULL
-                            THEN ReqNodes
-                        ELSE
+                        WHEN ReqNodes IS NULL THEN
                             ReqProcs / 16
+                        ELSE
+                            ReqNodes
                     END nodes
                     FROM showq_active
             )
