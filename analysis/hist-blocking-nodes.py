@@ -11,7 +11,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 11 Jul 2018
-#                                                   ~~ last updated 16 Jul 2018
+#                                                   ~~ last updated 18 Jul 2018
 
 import math
 import matplotlib.pyplot as pyplot
@@ -61,6 +61,8 @@ def analyze(connection):
                             showbf.starttime = showbf.SampleTime
                             AND
                             showq_eligible.EEDuration > 0
+                            AND
+                            showq_eligible.Class = "batch"
                 )
         ;
         """

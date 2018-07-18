@@ -8,7 +8,7 @@
 #   walltime duration and requested number of processors.
 #
 #                                                       ~~ (c) SRW, 21 Jun 2018
-#                                                   ~~ last updated 10 Jul 2018
+#                                                   ~~ last updated 18 Jul 2018
 
 import os
 import sqlite3
@@ -37,7 +37,10 @@ def analyze(connection):
                 AND
                 showbf.starttime = showbf.SampleTime
                 AND
-                showq_eligible.EEDuration > 0;
+                showq_eligible.EEDuration > 0
+                AND
+                showq_eligible.Class = "batch"
+        ;
         """
 
     num_eligible = 0

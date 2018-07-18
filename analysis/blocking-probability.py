@@ -18,7 +18,7 @@
 #   1) in SampleID versus SampleTime, however, is not yet explained.
 #
 #                                                       ~~ (c) SRW, 21 Jun 2018
-#                                                   ~~ last updated 17 Jul 2018
+#                                                   ~~ last updated 18 Jul 2018
 
 import os
 import sqlite3
@@ -63,6 +63,8 @@ def analyze(connection):
             showbf.starttime = showbf.SampleTime
             AND
             showq_eligible.EEDuration > 0
+            AND
+            showq_eligible.Class = "batch"
         ;
         """
 
