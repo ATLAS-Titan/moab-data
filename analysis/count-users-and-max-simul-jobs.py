@@ -40,7 +40,7 @@ def analyze(connection):
                         SampleTime
             ) usage
             WHERE
-                usage.jobs > 10
+                usage.jobs >= 10
         ;
         """
 
