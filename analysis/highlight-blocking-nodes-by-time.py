@@ -1,6 +1,6 @@
 #-  Python 2.7 source code
 
-#-  highlight-blocked-nodes-by-time.py ~~
+#-  highlight-blocking-nodes-by-time.py ~~
 #
 #   This program plots the total nodes in use at a given sample time by CSC108
 #   backfill, and it highlights the ones which are blocking other jobs by
@@ -11,7 +11,7 @@
 #       $ module load python_anaconda
 #
 #                                                       ~~ (c) SRW, 25 Jun 2018
-#                                                   ~~ last updated 18 Jul 2018
+#                                                   ~~ last updated 19 Jul 2018
 
 from datetime import datetime
 import matplotlib
