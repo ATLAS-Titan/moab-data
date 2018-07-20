@@ -6,7 +6,7 @@
 #   I have noticed in the data actually hold for the entire dataset.
 #
 #                                                       ~~ (c) SRW, 20 Jun 2018
-#                                                   ~~ last updated 16 Jul 2018
+#                                                   ~~ last updated 18 Jul 2018
 
 import os
 import sqlite3
@@ -65,6 +65,9 @@ def analyze(connection):
     for row in cursor.execute(query):
         if row["remainder"] != 0:
             print "Some value of `ReqProcs` is not divisible by 16."
+
+  # There is another weird thing I just figured out, though. It appears that
+  # `ReqNodes` only appears when its value is not the same as `ReqProcs / 16`.
 
 ###
 
