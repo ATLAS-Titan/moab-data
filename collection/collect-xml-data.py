@@ -11,7 +11,7 @@
 #   with subdirectories to store the XML files.
 #
 #                                                       ~~ (c) SRW, 06 Jun 2018
-#                                                   ~~ last updated 09 Jul 2018
+#                                                   ~~ last updated 23 Jul 2018
 
 import os
 import subprocess
@@ -97,6 +97,22 @@ def sample():
   #     with open(mjobctl_err, "wb") as err:
   #         subprocess.Popen(["mjobctl", "-q", "diag", "ALL", "--format=xml"],
   #                 stdout=out, stderr=err, env=env)
+
+
+  # Update: post-mortem data is available in the completed queue, so we will
+  # start recording that, too, and we will process it later. We use the exact
+  # same strategy to capture this data as we have used previously.
+
+    showqc_dir = "/lustre/atlas/proj-shared/csc108/data/moab/showqc"
+    if not os.path.exists(showqc_dir):
+        os.makedirs(showqc_dir)
+
+    showqc_out = os.path.join(showqc_dir, unique_hex + "-out.xml")
+    showqc_err = os.path.join(showqc_dir, unique_hex + "-err.xml")
+    with open(showqc_out, "wb") as out:
+        with open(showqc_err, "wb") as err:
+            subprocess.Popen(["showq", "-c", "-p", "titan", "--format=xml"],
+                    stdout=out, stderr=err, env=env)
 
 ###
 
