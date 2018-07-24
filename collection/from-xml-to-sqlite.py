@@ -51,16 +51,14 @@ def findNewUUIDs(connection, data_dir):
 
     showbf_dir = os.path.join(data_dir, "showbf")
     showq_dir = os.path.join(data_dir, "showq")
+    showqc_dir = os.path.join(data_dir, "showqc")
 
-    for filename in os.listdir(showbf_dir):
-        uuid = filename[:-8]
-        if (uuid not in sampleids) and (uuid not in uuids):
-            uuids.append(uuid)
-
-    for filename in os.listdir(showq_dir):
-        uuid = filename[:-8]
-        if (uuid not in sampleids) and (uuid not in uuids):
-            uuids.append(uuid)
+    for each in ["showbf", "showq", "showqc"]:
+        dirname = os.path.join(data_dir, each)
+        for filename in os.listdir(dirname):
+            uuid = filename[:-8]
+            if (uuid not in sampleids) and (uuid not in uuids):
+                uuids.append(uuid)
 
   # Return the list of UUIDs.
 
@@ -95,6 +93,32 @@ def importBackfill(connection, data_dir, uuids):
 
         if obj["tree"] is not None:
             showbfXMLtoSQL(connection, obj)
+
+    return
+
+###
+
+def importCompleted(connection, data_dir, uuids):
+
+  # Given a `Connection` object and a "data_dir" string indicating the path to
+  # the data directory, this function imports the `showq -c` (abbreviated
+  # throughout as "showqc") data into SQLite.
+
+  # Notice also that I really don't worry about error handling with the
+  # completed queue data, thanks to ridiculous amounts of multiple coverage.
+  # Sample identifiers don't matter at all in the completed queue data except
+  # that heeding them allows us avoid attempting to insert old files again.
+
+    cursor = connection.cursor()
+
+    showqc_dir = os.path.join(data_dir, "showqc")
+
+    for sampleid in uuids:
+        abspath = os.path.join(showqc_dir, sampleid + "-out.xml")
+        obj = readXML(abspath)
+
+        if obj["tree"] is not None:
+            showqcXMLtoSQL(connection, obj)
 
     return
 
@@ -137,6 +161,35 @@ def initializeDatabase(connection):
   # indexes for the SQLite3 database.
 
     cursor = connection.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS completed (
+            AWDuration INTEGER,
+            Account STRING NOT NULL,
+            Class STRING NOT NULL,
+            CompletionCode STRING NOT NULL, -- because "CNCLD" can occur
+            CompletionTime INTEGER NOT NULL,
+            DRMJID INTEGER NOT NULL,
+            EEDuration INTEGER,
+            GJID INTEGER NOT NULL,
+            Group_ STRING NOT NULL,
+            JobID INTEGER NOT NULL PRIMARY KEY,
+            JobName STRING NOT NULL,
+            MasterHost INTEGER,
+            PAL STRING,
+            QOS STRING NOT NULL,
+            ReqAWDuration INTEGER NOT NULL,
+            ReqNodes INTEGER,
+            ReqProcs INTEGER NOT NULL,
+            StartTime INTEGER NOT NULL,
+            StatPSDed REAL NOT NULL,
+            StatPSUtl REAL NOT NULL,
+            State STRING NOT NULL,
+            SubmissionTime INTEGER NOT NULL,
+            SuspendDuration INTEGER NOT NULL,
+            User STRING NOT NULL
+        );
+        """)
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS sample_info (
@@ -407,6 +460,7 @@ def main():
   # Start populating the database from the raw XML files.
 
     importBackfill(connection, data_dir, uuids)
+    importCompleted(connection, data_dir, uuids)
     importQueue(connection, data_dir, uuids)
 
   # When we are finished, close the connection to the database.
@@ -699,6 +753,67 @@ def showqXMLtoSQL(connection, obj):
             vals["RemoteConfigNodes"], vals["RemoteIdleNodes"],
             vals["RemoteIdleProcs"], vals["RemoteUpNodes"],
             vals["RemoteUpProcs"]))
+
+  # Commit changes
+
+    connection.commit()
+
+    return
+
+###
+
+def showqcXMLtoSQL(connection, obj):
+
+    cursor = connection.cursor()
+
+    data = {
+        "jobs": []
+    }
+
+    root = obj["tree"]
+
+    for elem in root:
+        if elem.tag == "queue":
+            for job in elem.getchildren():
+                data["jobs"].append(job.attrib)
+
+  # And already we are on to the SQL part.
+
+    completed_fields = [
+        "AWDuration", "Account", "Class", "CompletionCode", "CompletionTime",
+        "DRMJID", "EEDuration", "GJID", "Group", "JobID", "JobName",
+        "MasterHost", "PAL", "QOS", "ReqAWDuration", "ReqNodes", "ReqProcs",
+        "StartTime", "StatPSDed", "StatPSUtl", "State", "SubmissionTime",
+        "SuspendDuration", "User"
+    ]
+
+    for job in data["jobs"]:
+        vals = {}
+        for field in completed_fields:
+            if field in job:
+                vals[field] = job[field]
+            else:
+                vals[field] = None
+
+        cursor.execute("""
+            INSERT OR IGNORE INTO completed (
+                AWDuration, Account, Class, CompletionCode, CompletionTime,
+                DRMJID, EEDuration, GJID, Group_, JobID, JobName, MasterHost,
+                PAL, QOS, ReqAWDuration, ReqNodes, ReqProcs, StartTime,
+                StatPSDed, StatPSUtl, State, SubmissionTime, SuspendDuration,
+                User
+            ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?
+            )
+            """, (vals["AWDuration"], vals["Account"], vals["Class"],
+            vals["CompletionCode"], vals["CompletionTime"], vals["DRMJID"],
+            vals["EEDuration"], vals["GJID"], vals["Group"], vals["JobID"],
+            vals["JobName"], vals["MasterHost"], vals["PAL"], vals["QOS"],
+            vals["ReqAWDuration"], vals["ReqNodes"], vals["ReqProcs"],
+            vals["StartTime"], vals["StatPSDed"], vals["StatPSUtl"],
+            vals["State"], vals["SubmissionTime"], vals["SuspendDuration"],
+            vals["User"]))
 
   # Commit changes
 
