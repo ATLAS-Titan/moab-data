@@ -7,10 +7,10 @@
 #   will not run correctly on OLCF machines unless the appropriate module has
 #   been loaded beforehand:
 #
-#       $ module load python_anaconda
+#       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 22 Jun 2018
-#                                                   ~~ last updated 11 Jul 2018
+#                                                   ~~ last updated 24 Jul 2018
 
 from datetime import datetime
 

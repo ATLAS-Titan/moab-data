@@ -23,6 +23,6 @@ on Titan is to
 [load Anaconda](https://www.olcf.ornl.gov/software_package/anaconda/) prior to
 running any of the analysis scripts:
 
-    $ module load python_anaconda
+    $ module load python_anaconda2
     $ python analysis/visualization-template.py
 

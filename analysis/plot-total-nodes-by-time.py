@@ -6,10 +6,10 @@
 #   always, this program may or may not run on OLCF machines until you have
 #   invoked
 #
-#       $ module load python_anaconda
+#       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 25 Jun 2018
-#                                                   ~~ last updated 16 Jul 2018
+#                                                   ~~ last updated 24 Jul 2018
 
 from datetime import datetime
 import matplotlib.pyplot as pyplot

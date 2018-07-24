@@ -8,10 +8,10 @@
 #
 #   As always, remember to run the following if using an OLCF machine:
 #
-#       $ module load python_anaconda
+#       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 25 Jun 2018
-#                                                   ~~ last updated 19 Jul 2018
+#                                                   ~~ last updated 24 Jul 2018
 
 from datetime import datetime
 import matplotlib

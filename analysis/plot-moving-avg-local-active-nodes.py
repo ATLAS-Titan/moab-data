@@ -14,10 +14,10 @@
 #   As always with the programs that produce visuals, remember to load the
 #   appropriate module when running on OLCF machines:
 #
-#       $ module load python_anaconda
+#       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 20 Jul 2018
-#                                                   ~~ last updated 20 Jul 2018
+#                                                   ~~ last updated 24 Jul 2018
 
 from datetime import datetime
 

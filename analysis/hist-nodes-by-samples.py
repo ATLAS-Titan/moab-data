@@ -8,10 +8,10 @@
 #
 #   As always, remember to use the following on OLCF machines:
 #
-#       $ module load python_anaconda
+#       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 09 Jul 2018
-#                                                   ~~ last updated 16 Jul 2018
+#                                                   ~~ last updated 24 Jul 2018
 
 import math
 import matplotlib.pyplot as pyplot
