@@ -1,6 +1,6 @@
 #-  Python 2.6 source code
 
-#-  fresh.py ~~
+#-  from-xml-to-sqlite.py ~~
 #
 #   This program converts the raw XML files into a queryable SQL database
 #   using SQLite. Right now, this script is being tested for use on machines
@@ -14,7 +14,7 @@
 #   what the group has used elsewhere in the BigPanDA project as well.
 #
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 28 Jun 2018
+#                                                   ~~ last updated 24 Jul 2018
 
 import os
 import sqlite3
