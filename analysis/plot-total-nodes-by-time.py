@@ -81,6 +81,10 @@ def main():
 
     connection.row_factory = sqlite3.Row
 
+  # Ensure read-only access to the database
+
+    connection.execute("PRAGMA query_only = true;")
+
   # Run custom analyis code.
 
     analyze(connection)
