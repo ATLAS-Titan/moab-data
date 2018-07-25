@@ -13,7 +13,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 12 Jul 2018
-#                                                   ~~ last updated 24 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 from datetime import datetime
 
@@ -33,11 +33,8 @@ def analyze(connection):
                 SampleTime,
                 sum((ReqProcs / 16) *
                     (StartTime + ReqAWDuration - SampleTime) / 3600.0) AS hrs
-            FROM showq_active
-            WHERE
-                Account = "CSC108"
-                AND
-                User = "doleynik"
+            FROM active
+            WHERE Account = "CSC108" AND User = "doleynik"
             GROUP BY SampleID
         """
 

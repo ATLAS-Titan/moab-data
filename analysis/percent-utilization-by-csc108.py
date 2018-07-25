@@ -8,7 +8,7 @@
 #   as a way to check that the numbers are coming out as expected.
 #
 #                                                       ~~ (c) SRW, 20 Jun 2018
-#                                                   ~~ last updated 10 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 import json
 import os
@@ -26,14 +26,15 @@ def analyze(connection):
     cursor = connection.cursor()
 
     query = """
-        SELECT  count(showq_active.JobID) AS jobs,
-                sum(showq_active.ReqProcs) AS procs,
-                showq_meta.LocalUpProcs AS total_procs
-        FROM showq_active
-        INNER JOIN showq_meta ON
-            showq_active.SampleID = showq_meta.SampleID
-        WHERE showq_active.Account="CSC108" AND showq_active.User="doleynik"
-        GROUP BY showq_active.SampleID;
+        SELECT  count(active.JobID) AS jobs,
+                sum(active.ReqProcs) AS procs,
+                cluster.LocalUpProcs AS total_procs
+        FROM active
+        INNER JOIN cluster ON
+            active.SampleID = cluster.SampleID
+        WHERE active.Account="CSC108" AND active.User="doleynik"
+        GROUP BY active.SampleID
+        ;
         """
 
     jobs = []

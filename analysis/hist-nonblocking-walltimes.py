@@ -11,7 +11,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 11 Jul 2018
-#                                                   ~~ last updated 24 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 import math
 import matplotlib.pyplot as pyplot
@@ -28,7 +28,7 @@ def analyze(connection):
         WITH
             csc108 AS (
                 SELECT *
-                    FROM showq_active
+                    FROM active
                     WHERE
                         Account = "CSC108"
                         AND
@@ -36,24 +36,24 @@ def analyze(connection):
             ),
             blocked AS (
                 SELECT *
-                    FROM showq_eligible
+                    FROM eligible
                     INNER JOIN (
                         SELECT SampleID, sum(ReqProcs) AS procs
                             FROM csc108
                             GROUP BY SampleID
-                    ) bp ON showq_eligible.SampleID = bp.SampleID
-                    INNER JOIN showbf
-                        ON showbf.SampleID = showq_eligible.SampleID
+                    ) bp ON eligible.SampleID = bp.SampleID
+                    INNER JOIN backfill
+                        ON backfill.SampleID = eligible.SampleID
                     WHERE
-                        showq_eligible.ReqAWDuration < showbf.duration
+                        eligible.ReqAWDuration < backfill.duration
                         AND
-                        showq_eligible.ReqProcs < (showbf.proccount + bp.procs)
+                        eligible.ReqProcs < (backfill.proccount + bp.procs)
                         AND
-                        showbf.starttime = showbf.SampleTime
+                        backfill.starttime = backfill.SampleTime
                         AND
-                        showq_eligible.EEDuration > 0
+                        eligible.EEDuration > 0
                         AND
-                        showq_eligible.Class = "batch"
+                        eligible.Class = "batch"
             )
         SELECT DISTINCT JobID, ReqAWDuration AS walltime
             FROM csc108

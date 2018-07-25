@@ -10,7 +10,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 10 Jul 2018
-#                                                   ~~ last updated 24 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 import math
 import matplotlib.pyplot as pyplot
@@ -30,38 +30,31 @@ def analyze(connection):
         SELECT DISTINCT csc108.JobID, csc108.ReqAWDuration AS walltime
             FROM (
                 SELECT SampleID, JobID, ReqAWDuration
-                    FROM showq_active
-                    WHERE
-                        Account = "CSC108"
-                        AND
-                        User = "doleynik"
+                    FROM active
+                    WHERE Account = "CSC108" AND User = "doleynik"
             ) csc108
             WHERE
                 csc108.SampleID IN (
-                    SELECT DISTINCT showq_eligible.SampleID
-                        FROM showq_eligible
+                    SELECT DISTINCT eligible.SampleID
+                        FROM eligible
                         INNER JOIN (
                             SELECT SampleID, sum(ReqProcs) AS procs
-                                FROM showq_active
-                                WHERE
-                                    Account="CSC108"
-                                    AND
-                                    User="doleynik"
+                                FROM active
+                                WHERE Account = "CSC108" AND User = "doleynik"
                                 GROUP BY SampleID
-                        ) bp ON showq_eligible.SampleID = bp.SampleID
-                        INNER JOIN showbf ON
-                            showbf.SampleID = showq_eligible.SampleID
+                        ) bp ON eligible.SampleID = bp.SampleID
+                        INNER JOIN backfill ON
+                            backfill.SampleID = eligible.SampleID
                         WHERE
-                            showq_eligible.ReqAWDuration < showbf.duration
+                            eligible.ReqAWDuration < backfill.duration
                             AND
-                            showq_eligible.ReqProcs < (showbf.proccount +
-                                                                    bp.procs)
+                            eligible.ReqProcs < (backfill.proccount + bp.procs)
                             AND
-                            showbf.starttime = showbf.SampleTime
+                            backfill.starttime = backfill.SampleTime
                             AND
-                            showq_eligible.EEDuration > 0
+                            eligible.EEDuration > 0
                             AND
-                            showq_eligible.Class = "batch"
+                            eligible.Class = "batch"
                 )
         ;
         """

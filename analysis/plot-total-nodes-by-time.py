@@ -9,7 +9,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 25 Jun 2018
-#                                                   ~~ last updated 24 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 from datetime import datetime
 import matplotlib.pyplot as pyplot
@@ -24,9 +24,10 @@ def analyze(connection):
 
     query = """
         SELECT SampleTime, sum(ReqProcs / 16) AS nodes
-            FROM showq_active
-            WHERE Account="CSC108" AND User="doleynik"
-            GROUP BY SampleID;
+            FROM active
+            WHERE Account = "CSC108" AND User = "doleynik"
+            GROUP BY SampleID
+        ;
         """
 
     times = []

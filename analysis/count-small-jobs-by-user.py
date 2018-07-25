@@ -13,7 +13,7 @@
 #   official OLCF policy only allows a user to run 2 such jobs simultaneously. 
 #
 #                                                       ~~ (c) SRW, 19 Jul 2018
-#                                                   ~~ last updated 19 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 import os
 import sqlite3
@@ -33,7 +33,7 @@ def analyze(connection):
                         ELSE
                             ReqNodes
                     END nodes
-                FROM showq_active
+                FROM active
                 WHERE
                     nodes <= 125
         )

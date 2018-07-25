@@ -6,7 +6,7 @@
 #   it's easy to start modifying the program in order to explore the data.
 #
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 10 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 import json
 import os
@@ -19,7 +19,7 @@ def analyze(connection):
     cursor = connection.cursor()
 
     query = """
-        SELECT COUNT(SampleID) FROM showq_meta
+        SELECT COUNT(SampleID) FROM cluster
             WHERE SampleTime > (strftime('%s','now') - 3*24*60*60);
         """
 
@@ -27,7 +27,7 @@ def analyze(connection):
         print row[0]
 
     query = """
-        SELECT DISTINCT Account FROM showq_active;
+        SELECT DISTINCT Account FROM active;
         """
 
     for row in cursor.execute(query):

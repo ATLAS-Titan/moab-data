@@ -9,7 +9,7 @@
 #   exploration.
 #
 #                                                       ~~ (c) SRW, 18 Jul 2018
-#                                                   ~~ last updated 18 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 import json
 import os
@@ -31,7 +31,7 @@ def analyze(connection):
                             "localtime") AS t,
                         count(*) AS jobs,
                         Sum(ReqProcs) AS procs
-                    FROM showq_active
+                    FROM active
                     WHERE
                         SampleTime > (strftime("%s", "now") - 30*24*60*60)
                     GROUP BY

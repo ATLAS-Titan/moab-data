@@ -11,7 +11,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 25 Jun 2018
-#                                                   ~~ last updated 24 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 from datetime import datetime
 import matplotlib
@@ -27,30 +27,30 @@ def analyze(connection):
     cursor = connection.cursor()
 
     blocked_query = """
-        SELECT DISTINCT showq_eligible.SampleID,
-                        showq_eligible.SampleTime AS time,
+        SELECT DISTINCT eligible.SampleID,
+                        eligible.SampleTime AS time,
                         (csc108.procs / 16) AS nodes
-        FROM showq_eligible
+        FROM eligible
         INNER JOIN (
             SELECT SampleID, sum(ReqProcs) AS procs
-                FROM showq_active
-                WHERE Account="CSC108" AND User="doleynik"
+                FROM active
+                WHERE Account = "CSC108" AND User = "doleynik"
                 GROUP BY SampleID
-        ) csc108 ON showq_eligible.SampleID = csc108.SampleID
-        INNER JOIN showbf ON
-            showbf.SampleID = showq_eligible.SampleID
-        --INNER JOIN showq_meta ON
-        --    showq_meta.SampleID = showq_eligible.SampleID
+        ) csc108 ON eligible.SampleID = csc108.SampleID
+        INNER JOIN backfill ON
+            backfill.SampleID = eligible.SampleID
+        --INNER JOIN cluster ON
+        --    cluster.SampleID = eligible.SampleID
         WHERE
-            showq_eligible.ReqAWDuration < showbf.duration
+            eligible.ReqAWDuration < backfill.duration
             AND
-            showq_eligible.ReqProcs < (showbf.proccount + csc108.procs)
+            eligible.ReqProcs < (backfill.proccount + csc108.procs)
             AND
-            showbf.starttime = showbf.SampleTime
+            backfill.starttime = backfill.SampleTime
             AND
-            showq_eligible.EEDuration > 0
+            eligible.EEDuration > 0
             AND
-            showq_eligible.Class = "batch"
+            eligible.Class = "batch"
         ;
         """
 
@@ -72,9 +72,10 @@ def analyze(connection):
 
     all_query = """
         SELECT SampleTime, sum(ReqProcs / 16) AS nodes
-            FROM showq_active
-            WHERE Account="CSC108" AND User="doleynik"
-            GROUP BY SampleID;
+            FROM active
+            WHERE Account = "CSC108" AND User = "doleynik"
+            GROUP BY SampleID
+        ;
         """
 
     nodes = []

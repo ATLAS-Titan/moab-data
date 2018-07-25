@@ -10,7 +10,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 12 Jul 2018
-#                                                   ~~ last updated 24 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 from datetime import datetime
 
@@ -27,7 +27,7 @@ def analyze(connection):
     query = """
         SELECT  strftime("%w", SampleTime, "unixepoch", "localtime") AS day,
                 avg(ReqProcs / 16) AS nodes
-            FROM showq_active
+            FROM active
             WHERE
                 Account = "CSC108"
                 AND

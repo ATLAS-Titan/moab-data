@@ -18,7 +18,7 @@
 #   1) in SampleID versus SampleTime, however, is not yet explained.
 #
 #                                                       ~~ (c) SRW, 21 Jun 2018
-#                                                   ~~ last updated 18 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 import os
 import sqlite3
@@ -36,35 +36,35 @@ def analyze(connection):
   # - ReqProcs: requested processors
 
     query = """
-        SELECT count(DISTINCT showq_eligible.SampleID) AS n
+        SELECT count(DISTINCT eligible.SampleID) AS n
 
-        FROM showq_eligible
+        FROM eligible
 
         INNER JOIN (
             SELECT SampleID, sum(ReqProcs) AS procs
-                FROM showq_active
+                FROM active
                 WHERE Account="CSC108" AND User="doleynik"
                 GROUP BY SampleID
-        ) csc108 ON showq_eligible.SampleID = csc108.SampleID
+        ) csc108 ON eligible.SampleID = csc108.SampleID
 
-        INNER JOIN showbf ON
-            showbf.SampleID = showq_eligible.SampleID
+        INNER JOIN backfill ON
+            backfill.SampleID = eligible.SampleID
 
-        --INNER JOIN showq_meta ON
-        --    showq_meta.SampleID = showq_eligible.SampleID
+        --INNER JOIN cluster ON
+        --    cluster.SampleID = eligible.SampleID
 
         WHERE
-            showq_eligible.ReqAWDuration < showbf.duration
+            eligible.ReqAWDuration < backfill.duration
             AND
          -- This is still not right, though, because the CSC108 processors do
          -- not take duration into account here ...
-            showq_eligible.ReqProcs < (showbf.proccount + csc108.procs)
+            eligible.ReqProcs < (backfill.proccount + csc108.procs)
             AND
-            showbf.starttime = showbf.SampleTime
+            backfill.starttime = backfill.SampleTime
             AND
-            showq_eligible.EEDuration > 0
+            eligible.EEDuration > 0
             AND
-            showq_eligible.Class = "batch"
+            eligible.Class = "batch"
         ;
         """
 
@@ -75,8 +75,8 @@ def analyze(connection):
             num_blocked
 
     query = """
-        SELECT count(DISTINCT showq_eligible.SampleID) AS n
-        FROM showq_eligible
+        SELECT count(DISTINCT eligible.SampleID) AS n
+        FROM eligible
         ;
         """
 

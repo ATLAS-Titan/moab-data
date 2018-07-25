@@ -11,7 +11,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 11 Jul 2018
-#                                                   ~~ last updated 24 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 from datetime import datetime
 
@@ -31,11 +31,8 @@ def analyze(connection):
     query = """
         SELECT DISTINCT JobID,
                         (ReqProcs * ReqAWDuration / 3600.0) AS compute_hours
-            FROM showq_active
-            WHERE
-                Account="CSC108"
-                AND
-                User="doleynik"
+            FROM active
+            WHERE Account="CSC108" AND User="doleynik"
             GROUP BY SampleID;
         """
 

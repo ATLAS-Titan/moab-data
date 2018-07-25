@@ -17,7 +17,7 @@
 #   problem without simply populating the non-null values in ReqNodes.
 #
 #                                                       ~~ (c) SRW, 18 Jul 2018
-#                                                   ~~ last updated 18 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 import os
 import sqlite3
@@ -38,7 +38,7 @@ def analyze(connection):
                         ELSE
                             ReqNodes
                     END nodes
-                    FROM showq_active
+                    FROM active
             )
         ;
         """

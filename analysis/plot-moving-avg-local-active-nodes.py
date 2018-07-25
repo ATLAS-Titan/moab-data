@@ -17,7 +17,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 20 Jul 2018
-#                                                   ~~ last updated 24 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 from datetime import datetime
 
@@ -35,15 +35,15 @@ def analyze(connection):
     query = """
         SELECT  SampleTime AS time,
                 (SELECT avg(LocalActiveNodes)
-                    FROM showq_meta
+                    FROM cluster
                     WHERE
                      -- One hour window preceding the sample
-                        SampleTime > (showq_active.SampleTime - 1*60*60)
+                        SampleTime > (active.SampleTime - 1*60*60)
                         AND
-                        SampleTime <= showq_active.SampleTime
+                        SampleTime <= active.SampleTime
                 ) AS nodes
             FROM
-                showq_active
+                active
             WHERE
              -- Last seven days' data
                 SampleTime > (strftime("%s", "now") - 7*24*60*60)

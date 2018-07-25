@@ -2,10 +2,10 @@
 
 #-  explore-nodes-and-procs.py ~~
 #
-#   This program explores the "showq_meta" table on a very preliminary level.
+#   This program explores the "cluster" table on a very preliminary level.
 #
 #                                                       ~~ (c) SRW, 19 Jun 2018
-#                                                   ~~ last updated 28 Jun 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 import os
 import sqlite3
@@ -18,7 +18,7 @@ def analyze(connection):
 
     def compute_average(fieldname):
 
-        query = "SELECT avg({fieldname}) AS val FROM showq_meta".\
+        query = "SELECT avg({fieldname}) AS val FROM cluster".\
                 format(fieldname=fieldname)
 
         vals = []
@@ -36,7 +36,7 @@ def analyze(connection):
   # Now we need to compute the fieldnames. I could definitely hardcode them,
   # but I'd hate myself later if I changed the column names...
 
-    cursor = connection.execute("SELECT * FROM showq_meta LIMIT 1")
+    cursor = connection.execute("SELECT * FROM cluster LIMIT 1")
     row = cursor.fetchone()
     fieldnames = row.keys()
 

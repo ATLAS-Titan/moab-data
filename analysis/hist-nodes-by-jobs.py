@@ -11,7 +11,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 09 Jul 2018
-#                                                   ~~ last updated 24 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 import math
 import matplotlib.pyplot as pyplot
@@ -27,11 +27,11 @@ def analyze(connection):
   # The relationship between nodes and processors is always 1:16. You can check
   # this in the data set using
   #
-  #     SELECT DISTINCT (ReqProcs % 16) FROM showq_active;
+  #     SELECT DISTINCT (ReqProcs % 16) FROM active;
 
     query = """
         SELECT DISTINCT JobID, (ReqProcs / 16) AS nodes
-            FROM showq_active
+            FROM active
             WHERE Account="CSC108" AND User="doleynik"
         """
 

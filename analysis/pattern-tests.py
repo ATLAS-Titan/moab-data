@@ -6,7 +6,7 @@
 #   I have noticed in the data actually hold for the entire dataset.
 #
 #                                                       ~~ (c) SRW, 20 Jun 2018
-#                                                   ~~ last updated 18 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 import os
 import sqlite3
@@ -18,7 +18,7 @@ def analyze(connection):
     cursor = connection.cursor()
 
     query = """
-        SELECT * FROM showq_meta;
+        SELECT * FROM cluster;
         """
 
   # Check that the ratio between LocalUpNodes and LocalUpProcs is always 16:1.
@@ -30,20 +30,20 @@ def analyze(connection):
             if ratio != 16.0:
                 print "Up ratio: %s" % ratio
 
-  # Check that certain values are always zero in the "showbf" table.
+  # Check that certain values are always zero in the "backfill" table.
 
     query = """
-        SELECT * FROM showbf;
+        SELECT * FROM backfill;
         """
 
     for row in cursor.execute(query):
         fields_that_should_be_zero = ["index_", "reqid"]
         for field in fields_that_should_be_zero:
             if row[field] != 0:
-                print "%s is non-zero in showbf: %s" % (field, row[field])
+                print "%s is non-zero in backfill: %s" % (field, row[field])
 
     query = """
-        SELECT * FROM showq_meta;
+        SELECT * FROM cluster;
         """
 
     for row in cursor.execute(query):
@@ -53,13 +53,13 @@ def analyze(connection):
         ]
         for field in fields_that_should_be_zero:
             if row[field] != 0:
-                print "%s is non-zero in showq_meta: %s" % (field, row[field])
+                print "%s is non-zero in cluster: %s" % (field, row[field])
 
   # Check that the relationship between nodes and processors is always 1:16
   # by checking to make sure that `ReqProcs` is always divisible by 16.
 
     query = """
-        SELECT DISTINCT (ReqProcs % 16) AS remainder FROM showq_active;
+        SELECT DISTINCT (ReqProcs % 16) AS remainder FROM active;
         """
 
     for row in cursor.execute(query):

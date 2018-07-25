@@ -8,7 +8,7 @@
 #   walltime duration and requested number of processors.
 #
 #                                                       ~~ (c) SRW, 21 Jun 2018
-#                                                   ~~ last updated 18 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 import os
 import sqlite3
@@ -26,20 +26,20 @@ def analyze(connection):
   # - ReqProcs: requested processors
 
     query = """
-        SELECT count(DISTINCT showq_eligible.JobID) AS n
-            FROM showq_eligible
-            INNER JOIN showbf ON
-                showbf.SampleID = showq_eligible.SampleID
+        SELECT count(DISTINCT eligible.JobID) AS n
+            FROM eligible
+            INNER JOIN backfill ON
+                backfill.SampleID = eligible.SampleID
             WHERE
-                showq_eligible.ReqAWDuration < showbf.duration
+                eligible.ReqAWDuration < backfill.duration
                 AND
-                showq_eligible.ReqProcs < showbf.proccount
+                eligible.ReqProcs < backfill.proccount
                 AND
-                showbf.starttime = showbf.SampleTime
+                backfill.starttime = backfill.SampleTime
                 AND
-                showq_eligible.EEDuration > 0
+                eligible.EEDuration > 0
                 AND
-                showq_eligible.Class = "batch"
+                eligible.Class = "batch"
         ;
         """
 
@@ -49,7 +49,7 @@ def analyze(connection):
         print "Number eligible but idle: %s" % num_eligible
 
     query = """
-        SELECT count(DISTINCT showq_eligible.JobID) AS n FROM showq_eligible;
+        SELECT count(DISTINCT eligible.JobID) AS n FROM eligible;
         """
 
     num_total = 0

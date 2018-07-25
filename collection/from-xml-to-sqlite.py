@@ -14,7 +14,7 @@
 #   what the group has used elsewhere in the BigPanDA project as well.
 #
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 24 Jul 2018
+#                                                   ~~ last updated 25 Jul 2018
 
 import os
 import sqlite3
@@ -124,7 +124,7 @@ def importCompleted(connection, data_dir, uuids):
 
 ###
 
-def importQueue(connection, data_dir, uuids):
+def importQueues(connection, data_dir, uuids):
 
   # Given a `Connection` object and a "data_dir" string indicating the path to
   # the data directory, this function imports the `showq` data into SQLite.
@@ -163,72 +163,7 @@ def initializeDatabase(connection):
     cursor = connection.cursor()
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS completed (
-            AWDuration INTEGER,
-            Account STRING NOT NULL,
-            Class STRING NOT NULL,
-            CompletionCode STRING NOT NULL, -- because "CNCLD" can occur
-            CompletionTime INTEGER NOT NULL,
-            DRMJID INTEGER NOT NULL,
-            EEDuration INTEGER,
-            GJID INTEGER NOT NULL,
-            Group_ STRING NOT NULL,
-            JobID INTEGER NOT NULL PRIMARY KEY,
-            JobName STRING NOT NULL,
-            MasterHost INTEGER,
-            PAL STRING,
-            QOS STRING NOT NULL,
-            ReqAWDuration INTEGER NOT NULL,
-            ReqNodes INTEGER,
-            ReqProcs INTEGER NOT NULL,
-            StartTime INTEGER NOT NULL,
-            StatPSDed REAL NOT NULL,
-            StatPSUtl REAL NOT NULL,
-            State STRING NOT NULL,
-            SubmissionTime INTEGER NOT NULL,
-            SuspendDuration INTEGER NOT NULL,
-            User STRING NOT NULL
-        );
-        """)
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS sample_info (
-            SampleID STRING PRIMARY KEY,
-            showbfError STRING,
-            showqError STRING
-        );
-        """)
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS showbf (
-
-         -- Metadata for our study
-
-            SampleID STRING NOT NULL,
-            SampleTime INTEGER NOT NULL,
-
-         -- Data
-
-            duration INTEGER NOT NULL,
-            index_ INTEGER NOT NULL,
-            proccount INTEGER NOT NULL,
-            nodecount INTEGER NOT NULL,
-            reqid INTEGER NOT NULL,
-            starttime INTEGER NOT NULL,
-
-         -- Other table-specific information
-
-            CONSTRAINT unique_rows UNIQUE (
-                SampleID, SampleTime, duration, index_, proccount, nodecount,
-                reqid, starttime
-            ),
-
-            FOREIGN KEY(SampleID) REFERENCES sample_info(SampleID)
-        );
-        """)
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS showq_active (
+        CREATE TABLE IF NOT EXISTS active (
 
          -- Metadata for our study
 
@@ -280,7 +215,35 @@ def initializeDatabase(connection):
         """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS showq_blocked (
+        CREATE TABLE IF NOT EXISTS backfill (
+
+         -- Metadata for our study
+
+            SampleID STRING NOT NULL,
+            SampleTime INTEGER NOT NULL,
+
+         -- Data
+
+            duration INTEGER NOT NULL,
+            index_ INTEGER NOT NULL,
+            proccount INTEGER NOT NULL,
+            nodecount INTEGER NOT NULL,
+            reqid INTEGER NOT NULL,
+            starttime INTEGER NOT NULL,
+
+         -- Other table-specific information
+
+            CONSTRAINT unique_rows UNIQUE (
+                SampleID, SampleTime, duration, index_, proccount, nodecount,
+                reqid, starttime
+            ),
+
+            FOREIGN KEY(SampleID) REFERENCES sample_info(SampleID)
+        );
+        """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS blocked (
 
          -- Metadata for our study
 
@@ -307,7 +270,6 @@ def initializeDatabase(connection):
             SuspendDuration INTEGER NOT NULL,
             User STRING NOT NULL,
 
-
          -- Other table-specific information
 
             CONSTRAINT unique_rows UNIQUE (
@@ -325,7 +287,79 @@ def initializeDatabase(connection):
         """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS showq_eligible (
+        CREATE TABLE IF NOT EXISTS cluster (
+
+         -- Metadata for our study
+
+            SampleID STRING NOT NULL,
+            SampleTime INTEGER NOT NULL,
+
+         -- Data
+
+            LocalActiveNodes INTEGER NOT NULL,
+            LocalAllocProcs INTEGER NOT NULL,
+            LocalConfigNodes INTEGER NOT NULL,
+            LocalIdleNodes INTEGER NOT NULL,
+            LocalIdleProcs INTEGER NOT NULL,
+            LocalUpNodes INTEGER NOT NULL,
+            LocalUpProcs INTEGER NOT NULL,
+            RemoteActiveNodes INTEGER NOT NULL,
+            RemoteAllocProcs INTEGER NOT NULL,
+            RemoteConfigNodes INTEGER NOT NULL,
+            RemoteIdleNodes INTEGER NOT NULL,
+            RemoteIdleProcs INTEGER NOT NULL,
+            RemoteUpNodes INTEGER NOT NULL,
+            RemoteUpProcs INTEGER NOT NULL,
+
+         -- Other table-specific information
+
+            CONSTRAINT unique_rows UNIQUE (
+
+             -- This can probably simplify to SampleID, SampleTime
+
+                SampleID, SampleTime, LocalActiveNodes, LocalAllocProcs,
+                LocalConfigNodes, LocalIdleNodes, LocalIdleProcs, LocalUpNodes,
+                LocalUpProcs, RemoteActiveNodes, RemoteAllocProcs,
+                RemoteConfigNodes, RemoteIdleNodes, RemoteIdleProcs,
+                RemoteUpNodes, RemoteUpProcs
+
+            ),
+
+            FOREIGN KEY(SampleID) REFERENCES sample_info(SampleID)
+        )
+        """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS completed (
+            AWDuration INTEGER,
+            Account STRING NOT NULL,
+            Class STRING NOT NULL,
+            CompletionCode STRING NOT NULL, -- because "CNCLD" can occur
+            CompletionTime INTEGER NOT NULL,
+            DRMJID INTEGER NOT NULL,
+            EEDuration INTEGER,
+            GJID INTEGER NOT NULL,
+            Group_ STRING NOT NULL,
+            JobID INTEGER NOT NULL PRIMARY KEY,
+            JobName STRING NOT NULL,
+            MasterHost INTEGER,
+            PAL STRING,
+            QOS STRING NOT NULL,
+            ReqAWDuration INTEGER NOT NULL,
+            ReqNodes INTEGER,
+            ReqProcs INTEGER NOT NULL,
+            StartTime INTEGER NOT NULL,
+            StatPSDed REAL NOT NULL,
+            StatPSUtl REAL NOT NULL,
+            State STRING NOT NULL,
+            SubmissionTime INTEGER NOT NULL,
+            SuspendDuration INTEGER NOT NULL,
+            User STRING NOT NULL
+        );
+        """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS eligible (
 
          -- Metadata for our study
 
@@ -370,46 +404,11 @@ def initializeDatabase(connection):
         """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS showq_meta (
-
-         -- Metadata for our study
-
-            SampleID STRING NOT NULL,
-            SampleTime INTEGER NOT NULL,
-
-         -- Data
-
-            LocalActiveNodes INTEGER NOT NULL,
-            LocalAllocProcs INTEGER NOT NULL,
-            LocalConfigNodes INTEGER NOT NULL,
-            LocalIdleNodes INTEGER NOT NULL,
-            LocalIdleProcs INTEGER NOT NULL,
-            LocalUpNodes INTEGER NOT NULL,
-            LocalUpProcs INTEGER NOT NULL,
-            RemoteActiveNodes INTEGER NOT NULL,
-            RemoteAllocProcs INTEGER NOT NULL,
-            RemoteConfigNodes INTEGER NOT NULL,
-            RemoteIdleNodes INTEGER NOT NULL,
-            RemoteIdleProcs INTEGER NOT NULL,
-            RemoteUpNodes INTEGER NOT NULL,
-            RemoteUpProcs INTEGER NOT NULL,
-
-         -- Other table-specific information
-
-            CONSTRAINT unique_rows UNIQUE (
-
-             -- This can probably simplify to SampleID, SampleTime
-
-                SampleID, SampleTime, LocalActiveNodes, LocalAllocProcs,
-                LocalConfigNodes, LocalIdleNodes, LocalIdleProcs, LocalUpNodes,
-                LocalUpProcs, RemoteActiveNodes, RemoteAllocProcs,
-                RemoteConfigNodes, RemoteIdleNodes, RemoteIdleProcs,
-                RemoteUpNodes, RemoteUpProcs
-
-            ),
-
-            FOREIGN KEY(SampleID) REFERENCES sample_info(SampleID)
-        )
+        CREATE TABLE IF NOT EXISTS sample_info (
+            SampleID STRING PRIMARY KEY,
+            showbfError STRING,
+            showqError STRING
+        );
         """)
 
   # Commit changes
@@ -461,7 +460,7 @@ def main():
 
     importBackfill(connection, data_dir, uuids)
     importCompleted(connection, data_dir, uuids)
-    importQueue(connection, data_dir, uuids)
+    importQueues(connection, data_dir, uuids)
 
   # When we are finished, close the connection to the database.
 
@@ -551,7 +550,7 @@ def showbfXMLtoSQL(connection, obj):
     for key in data["partitions"]:
         for each in data["partitions"][key]:
             cursor.execute("""
-                INSERT OR IGNORE INTO showbf (
+                INSERT OR IGNORE INTO backfill (
                     SampleID, SampleTime, duration, index_, proccount,
                     nodecount, reqid, starttime
                 ) VALUES (
@@ -574,12 +573,12 @@ def showqXMLtoSQL(connection, obj):
     cursor = connection.cursor()
 
     data = {
+        "cluster": {},
         "jobs": {
             "active": [],
-            "eligible": [],
-            "blocked": []
-        },
-        "meta": {}
+            "blocked": [],
+            "eligible": []
+        }
     }
 
     root = obj["tree"]
@@ -593,7 +592,7 @@ def showqXMLtoSQL(connection, obj):
 
         if elem.tag == "cluster":
 
-            data["meta"] = elem.attrib
+            data["cluster"] = elem.attrib
 
         elif elem.tag == "queue":
 
@@ -611,12 +610,12 @@ def showqXMLtoSQL(connection, obj):
 
   # Now the fun part -- the SQL.
 
-    if "time" not in data["meta"]:
+    if "time" not in data["cluster"]:
         return
 
-    time = data["meta"]["time"]
+    time = data["cluster"]["time"]
 
-  # First, showq_active ...
+  # First, the "active" table ...
 
     active_fields = [
         "Account", "AWDuration", "Class", "DRMJID", "EEDuration",
@@ -637,7 +636,7 @@ def showqXMLtoSQL(connection, obj):
                 vals[field] = None
 
         cursor.execute("""
-            INSERT OR IGNORE INTO showq_active (
+            INSERT OR IGNORE INTO active (
                 SampleID, SampleTime, Account, AWDuration, Class, DRMJID,
                 EEDuration, GJID, Group_, JobID, JobName, MasterHost, PAL,
                 QOS, ReqAWDuration, ReqNodes, ReqProcs, RsvStartTime,
@@ -660,7 +659,7 @@ def showqXMLtoSQL(connection, obj):
 
     connection.commit()
 
-  # Next, showq_blocked ...
+  # Next, the "blocked" table ...
 
     blocked_fields = [
         "Account", "Class", "DRMJID", "EEDuration", "GJID", "Group", "JobID",
@@ -678,7 +677,7 @@ def showqXMLtoSQL(connection, obj):
                 vals[field] = None
 
         cursor.execute("""
-            INSERT OR IGNORE INTO showq_blocked (
+            INSERT OR IGNORE INTO blocked (
                 SampleID, SampleTime, Account, Class, DRMJID, EEDuration, GJID,
                 Group_, JobID, JobName, QOS, ReqAWDuration, ReqProcs,
                 StartPriority, StartTime, State, SubmissionTime,
@@ -695,7 +694,30 @@ def showqXMLtoSQL(connection, obj):
 
     connection.commit()
 
-  # Next, showq_eligible ...
+  # Next, the live data about the "cluster", which was previously named "meta".
+
+    vals = data["cluster"]
+
+    cursor.execute("""
+        INSERT OR IGNORE INTO cluster (
+            SampleID, SampleTime, LocalActiveNodes, LocalAllocProcs,
+            LocalConfigNodes, LocalIdleNodes, LocalIdleProcs, LocalUpNodes,
+            LocalUpProcs, RemoteActiveNodes, RemoteAllocProcs,
+            RemoteConfigNodes, RemoteIdleNodes, RemoteIdleProcs, RemoteUpNodes,
+            RemoteUpProcs
+        ) VALUES (
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        )
+        """, (sampleid, time, vals["LocalActiveNodes"],
+            vals["LocalAllocProcs"], vals["LocalConfigNodes"],
+            vals["LocalIdleNodes"], vals["LocalIdleProcs"],
+            vals["LocalUpNodes"], vals["LocalUpProcs"],
+            vals["RemoteActiveNodes"], vals["RemoteAllocProcs"],
+            vals["RemoteConfigNodes"], vals["RemoteIdleNodes"],
+            vals["RemoteIdleProcs"], vals["RemoteUpNodes"],
+            vals["RemoteUpProcs"]))
+
+  # Finally, the "eligible" table ...
 
     eligible_fields = [
         "Account", "Class", "DRMJID", "EEDuration", "GJID", "Group", "JobID",
@@ -714,7 +736,7 @@ def showqXMLtoSQL(connection, obj):
                 vals[field] = None
 
         cursor.execute("""
-            INSERT OR IGNORE INTO showq_eligible (
+            INSERT OR IGNORE INTO eligible (
                 SampleID, SampleTime, Account, Class, DRMJID, EEDuration, GJID,
                 Group_, JobID, JobName, QOS, ReqAWDuration, ReqProcs,
                 RsvStartTime, StartPriority, StartTime, State, SubmissionTime,
@@ -730,29 +752,6 @@ def showqXMLtoSQL(connection, obj):
                 vals["SubmissionTime"], vals["SuspendDuration"], vals["User"]))
 
     connection.commit()
-
-  # Finally, showq_meta.
-
-    vals = data["meta"]
-
-    cursor.execute("""
-        INSERT OR IGNORE INTO showq_meta (
-            SampleID, SampleTime, LocalActiveNodes, LocalAllocProcs,
-            LocalConfigNodes, LocalIdleNodes, LocalIdleProcs, LocalUpNodes,
-            LocalUpProcs, RemoteActiveNodes, RemoteAllocProcs,
-            RemoteConfigNodes, RemoteIdleNodes, RemoteIdleProcs, RemoteUpNodes,
-            RemoteUpProcs
-        ) VALUES (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-        )
-        """, (sampleid, time, vals["LocalActiveNodes"],
-            vals["LocalAllocProcs"], vals["LocalConfigNodes"],
-            vals["LocalIdleNodes"], vals["LocalIdleProcs"],
-            vals["LocalUpNodes"], vals["LocalUpProcs"],
-            vals["RemoteActiveNodes"], vals["RemoteAllocProcs"],
-            vals["RemoteConfigNodes"], vals["RemoteIdleNodes"],
-            vals["RemoteIdleProcs"], vals["RemoteUpNodes"],
-            vals["RemoteUpProcs"]))
 
   # Commit changes
 
