@@ -11,11 +11,9 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 11 Jul 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 27 Jul 2018
 
-from datetime import datetime
-
-import math
+#import math
 import matplotlib.pyplot as pyplot
 import os
 import sqlite3
@@ -25,8 +23,6 @@ import sqlite3
 def analyze(connection):
 
     cursor = connection.cursor()
-
-    start_of_month = datetime.today().replace(day=1, hour=0, minute=0)
 
     query = """
         SELECT DISTINCT JobID,
