@@ -34,8 +34,8 @@ def analyze(connection):
                         active
                     INNER JOIN
                         eligible ON
-                            active.SampleID = eligible.SampleID
-                            AND active.Account = eligible.Account
+                            active.Account = eligible.Account
+                            AND active.SampleID = eligible.SampleID
                     GROUP BY
                         active.Account, active.SampleID
                     HAVING
