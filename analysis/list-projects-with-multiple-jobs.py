@@ -8,7 +8,6 @@
 #                                                       ~~ (c) SRW, 04 Aug 2018
 #                                                   ~~ last updated 04 Aug 2018
 
-import json
 import os
 import sqlite3
 
