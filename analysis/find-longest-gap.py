@@ -10,7 +10,7 @@
 #   out yet.
 #
 #                                                       ~~ (c) SRW, 03 Aug 2018
-#                                                   ~~ last updated 03 Aug 2018
+#                                                   ~~ last updated 07 Aug 2018
 
 from datetime import datetime
 
@@ -57,7 +57,7 @@ def analyze(connection):
     print "Longest gap starts at %s" % left_time
     print "Longest gap ends at %s" % right_time
 
-    print "Gap length is %s" % max(deltas)
+    print "Gap length is %s (%s hours)" % (max(deltas), max(deltas) / 3600.0)
 
 ###
 
