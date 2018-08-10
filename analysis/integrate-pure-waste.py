@@ -32,6 +32,7 @@ def analyze(connection):
             WHERE
                 Account = "CSC108"
                 AND User = "doleynik"
+                --AND StartTime > (strftime('%s','now') - 1*24*60*60)
             ORDER BY
                 StartTime
         ;
@@ -51,6 +52,7 @@ def analyze(connection):
             WHERE
                 Account != "CSC108"
                 OR User != "doleynik"
+                --AND StartTime > (strftime('%s','now') - 1*24*60*60)
             ORDER BY
                 StartTime
         ;
