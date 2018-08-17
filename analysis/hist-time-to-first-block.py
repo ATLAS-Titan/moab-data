@@ -14,7 +14,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 26 Jul 2018
-#                                                   ~~ last updated 26 Jul 2018
+#                                                   ~~ last updated 17 Aug 2018
 
 import matplotlib.pyplot as pyplot
 from matplotlib.ticker import MaxNLocator
@@ -84,7 +84,7 @@ def analyze(connection):
     ax.yaxis.set_major_locator(MaxNLocator(integer = True))
 
     pyplot.xlabel("Length of time interval (seconds)")
-    pyplot.ylabel("Count")
+    pyplot.ylabel("Number of Jobs")
     pyplot.title("Time to First Block for CSC108 Backfill Jobs")
     pyplot.grid(True)
 
