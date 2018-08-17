@@ -1,6 +1,6 @@
 #-  Python 2.7 source code
 
-#-  hist-requested-compute-hours.py ~~
+#-  hist-requested-node-hours.py ~~
 #
 #   This program computes the distribution of CSC108 backfill jobs' "size".
 #   Here, that is defined as the requested node hours for a job, which is
