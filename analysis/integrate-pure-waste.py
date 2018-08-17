@@ -8,7 +8,7 @@
 #   start and the start of the next job owned by another project.
 #
 #                                                       ~~ (c) SRW, 09 Aug 2018
-#                                                   ~~ last updated 10 Aug 2018
+#                                                   ~~ last updated 17 Aug 2018
 
 import os
 import sqlite3
@@ -73,7 +73,8 @@ def analyze(connection):
     index = 0
     waste = []
     for csc108_job in csc108:
-        while other[index]["StartTime"] < csc108_job["StartTime"]:
+        while (other[index]["StartTime"] < csc108_job["StartTime"]
+                and index < len(other) - 1):
             index += 1
         dt = (other[index]["StartTime"] - csc108_job["StartTime"]) / 3600.0
         waste.append(csc108_job["nodes"] * dt)
