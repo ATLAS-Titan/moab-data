@@ -3,15 +3,15 @@
 #-  hist-requested-compute-hours.py ~~
 #
 #   This program computes the distribution of CSC108 backfill jobs' "size".
-#   Here, that is defined as the requested compute hours for a job, which is
-#   the product of each job's requested processors and its requested walltime.
+#   Here, that is defined as the requested node hours for a job, which is
+#   the product of each job's requested nodes and its requested walltime.
 #
 #   As always, remember to run the following on OLCF machines:
 #
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 11 Jul 2018
-#                                                   ~~ last updated 27 Jul 2018
+#                                                   ~~ last updated 17 Aug 2018
 
 #import math
 import matplotlib.pyplot as pyplot
@@ -26,7 +26,7 @@ def analyze(connection):
 
     query = """
         SELECT DISTINCT JobID,
-                        (ReqProcs * ReqAWDuration / 3600.0) AS compute_hours
+                        ((ReqProcs / 16.0) * ReqAWDuration / 3600.0) AS hours
             FROM active
             WHERE Account="CSC108" AND User="doleynik"
             GROUP BY SampleID;
@@ -34,7 +34,7 @@ def analyze(connection):
 
     sizes = []
     for row in cursor.execute(query):
-        sizes.append(row["compute_hours"])
+        sizes.append(row["hours"])
 
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
@@ -48,9 +48,9 @@ def analyze(connection):
     #
     #pyplot.xticks(locs, new_labels)
 
-    pyplot.xlabel("Compute Hours")
-    pyplot.ylabel("Samples")
-    pyplot.title("Histogram of CSC108 Backfill Job Size")
+    pyplot.xlabel("Node Hours")
+    pyplot.ylabel("Number of Samples")
+    pyplot.title("Histogram of CSC108 Backfill Total Requested Resources")
     pyplot.grid(True)
 
     current_script = os.path.basename(__file__)

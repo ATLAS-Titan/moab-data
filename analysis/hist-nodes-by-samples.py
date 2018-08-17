@@ -11,7 +11,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 09 Jul 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 17 Aug 2018
 
 import math
 import matplotlib.pyplot as pyplot
@@ -48,7 +48,7 @@ def analyze(connection):
     pyplot.xticks(locs, new_labels)
 
     pyplot.xlabel("Nodes (log-scaled)")
-    pyplot.ylabel("Samples")
+    pyplot.ylabel("Number of Samples")
     pyplot.title("Histogram of CSC108 Backfill Nodes")
     pyplot.grid(True)
 

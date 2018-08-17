@@ -77,7 +77,7 @@ def analyze(connection):
     pyplot.xticks(locs, new_labels)
 
     pyplot.xlabel("Nodes (log-scaled)")
-    pyplot.ylabel("Jobs")
+    pyplot.ylabel("Number of Jobs")
     pyplot.title("Histogram of Blocking CSC108 Backfill Jobs' Nodes")
     pyplot.grid(True)
 

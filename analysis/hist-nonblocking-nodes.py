@@ -11,7 +11,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 11 Jul 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 17 Aug 2018
 
 import math
 import matplotlib.pyplot as pyplot
@@ -83,7 +83,7 @@ def analyze(connection):
     pyplot.xticks(locs, new_labels)
 
     pyplot.xlabel("Nodes (log-scaled)")
-    pyplot.ylabel("Jobs")
+    pyplot.ylabel("Number of Jobs")
     pyplot.title("Histogram of Non-blocking CSC108 Backfill Jobs' Nodes")
     pyplot.grid(True)
 
