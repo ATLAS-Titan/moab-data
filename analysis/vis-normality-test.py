@@ -1,10 +1,13 @@
 #-  Python 2.7 source code
 
-#-  qq-plot-template.py ~~
+#-  vis-normality-test.py ~~
 #
-#   This program provides a template with which to construct Quantile-Quantile
-#   (QQ) plots via SciPy and Matplotlib. This program will not run correctly on
-#   OLCF machines unless the appropriate module has already been loaded:
+#   This program provides a visual test of normality for a distribution by
+#   using SciPy and Matplotlib. This idea is so related to QQ plots that I
+#   initially committed this as "qq-plot-template.py".
+#
+#   Note that this program will not run correctly on OLCF machines unless the
+#   appropriate module has already been loaded:
 #
 #       $ module load python_anaconda2
 #
