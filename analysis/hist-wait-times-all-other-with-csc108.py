@@ -1,6 +1,10 @@
 #-  Python 2.7 source code
 
-#-  hist-wait-times-all-other.py ~~
+#-  hist-wait-times-all-other-with-csc108.py ~~
+#
+#   This creates a histogram to visualize the distribution of the wait times
+#   for all jobs not belonging to CSC108 which were submitted while CSC108 had
+#   at least one active job running in backfill.
 #
 #   As always, remember to run the following on OLCF machines:
 #
@@ -66,7 +70,7 @@ def analyze(connection):
 
     pyplot.xlabel("Wait Time (seconds)")
     pyplot.ylabel("Number of Samples")
-    pyplot.title("Distribution of Wait Times for All Non-CSC108 Jobs on Titan")
+    pyplot.title("Wait Times for All Other Jobs While CSC108 Is Running Jobs")
     pyplot.grid(True)
 
     current_script = os.path.basename(__file__)
