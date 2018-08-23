@@ -22,8 +22,6 @@ def analyze(connection):
 
     cursor = connection.cursor()
 
-    start_of_month = datetime.today().replace(day=1, hour=0, minute=0)
-
   # Note that simple queries like this one still run reasonably quickly when
   # using the "active" table instead of "completed", but everything falls apart
   # in other programs when the queries get complicated.

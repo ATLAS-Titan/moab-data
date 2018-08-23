@@ -26,8 +26,6 @@ def analyze(connection):
 
     cursor = connection.cursor()
 
-    start_of_month = datetime.today().replace(day=1, hour=0, minute=0)
-
   # The following query computes WaitTime for projects other than CSC108, when
   # CSC108 is running jobs in backfill. It checks to make sure that the various
   # time-related fields are properly sequenced and returns rows representing
