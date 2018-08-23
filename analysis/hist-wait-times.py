@@ -7,7 +7,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 21 Aug 2018
-#                                                   ~~ last updated 21 Aug 2018
+#                                                   ~~ last updated 23 Aug 2018
 
 from datetime import datetime
 
@@ -24,11 +24,16 @@ def analyze(connection):
 
     start_of_month = datetime.today().replace(day=1, hour=0, minute=0)
 
+  # Note that simple queries like this one still run reasonably quickly when
+  # using the "active" table instead of "completed", but everything falls apart
+  # in other programs when the queries get complicated.
+
     query = """
         SELECT  DISTINCT JobID,
                 (StartTime - SubmissionTime) AS WaitTime
             FROM
-                completed
+                active
+                --completed
             WHERE
                 SubmissionTime <= StartTime
                 --AND (ReqProcs / 16) > 3749

@@ -6,7 +6,7 @@
 #   I have noticed in the data actually hold for the entire dataset.
 #
 #                                                       ~~ (c) SRW, 20 Jun 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 23 Aug 2018
 
 import os
 import sqlite3
@@ -68,6 +68,41 @@ def analyze(connection):
 
   # There is another weird thing I just figured out, though. It appears that
   # `ReqNodes` only appears when its value is not the same as `ReqProcs / 16`.
+
+  # -----
+
+    query = """
+        SELECT count(DISTINCT active.JobID) AS n
+            FROM
+                active
+            INNER JOIN
+                completed ON active.JobID = completed.JobID
+            WHERE
+                active.SubmissionTime != completed.SubmissionTime
+        ;
+        """
+
+    for row in cursor.execute(query):
+        if row["n"] != 0:
+            print "Some (%s) values of 'SubmissionTime' changed." % row["n"]
+
+  # So, SubmissionTime always stays the same, but it appear that the same is
+  # not true of StartTime.
+
+    query = """
+        SELECT count(DISTINCT active.JobID) AS n
+            FROM
+                active
+            INNER JOIN
+                completed ON active.JobID = completed.JobID
+            WHERE
+                active.StartTime != completed.StartTime
+        ;
+        """
+
+    for row in cursor.execute(query):
+        if row["n"] != 0:
+            print "Some (%s) values of 'StartTime' changed." % row["n"]
 
 ###
 
