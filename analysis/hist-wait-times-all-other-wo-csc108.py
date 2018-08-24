@@ -11,7 +11,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 22 Aug 2018
-#                                                   ~~ last updated 22 Aug 2018
+#                                                   ~~ last updated 24 Aug 2018
 
 from datetime import datetime
 
@@ -72,7 +72,7 @@ def analyze(connection):
 
     pyplot.xlabel("Wait Time (seconds)")
     pyplot.ylabel("Number of Samples")
-    pyplot.title("Wait Times for All Other Jobs While CSC108 Is Dormant")
+    pyplot.title("Wait Times for All Other Jobs While CSC108 Is Inactive")
     pyplot.grid(True)
 
     current_script = os.path.basename(__file__)

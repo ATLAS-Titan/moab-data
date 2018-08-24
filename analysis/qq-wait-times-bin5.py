@@ -77,7 +77,7 @@ def analyze(connection):
         with_csc108.append(row["WaitTime"])
 
   # Now we will change the query to find WaitTimes for jobs that ran while
-  # CSC108 was "dormant".
+  # CSC108 was inactive.
 
     query = """
         WITH conflicting AS (
