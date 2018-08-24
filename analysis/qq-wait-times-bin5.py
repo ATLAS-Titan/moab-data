@@ -15,7 +15,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 23 Aug 2018
-#                                                   ~~ last updated 23 Aug 2018
+#                                                   ~~ last updated 24 Aug 2018
 
 from datetime import datetime
 import matplotlib
@@ -55,7 +55,10 @@ def analyze(connection):
                 AND (A.Account = "CSC108" AND A.User = "doleynik")
                 AND (B.Account != "CSC108" OR B.User != "doleynik")
 
-                AND B.ReqNodes <= 125
+                AND ((B.ReqNodes IS NULL
+                        AND (B.ReqProcs / 16) <= 125)
+                    OR (B.ReqNodes IS NOT NULL
+                        AND B.ReqNodes <= 125))
 
                 AND A.SubmissionTime <= A.StartTime
                 AND A.StartTime <= A.CompletionTime
@@ -98,7 +101,10 @@ def analyze(connection):
             FROM completed
             WHERE
                 (Account != "CSC108" OR User != "doleynik")
-                AND ReqNodes <= 125
+                AND ((ReqNodes IS NULL
+                        AND (ReqProcs / 16) <= 125)
+                    OR (ReqNodes IS NOT NULL
+                        AND ReqNodes <= 125))
                 AND JobID NOT IN (SELECT * FROM conflicting)
                 AND SubmissionTime < StartTime
         ;
@@ -115,8 +121,6 @@ def analyze(connection):
     marks_to_use = range(10, 90)
     marks_with = numpy.percentile(with_csc108, marks_to_use)
     marks_wo = numpy.percentile(wo_csc108, marks_to_use)
-
-    print marks_with
 
   # Create the QQ plot.
 

@@ -13,7 +13,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 23 Aug 2018
-#                                                   ~~ last updated 23 Aug 2018
+#                                                   ~~ last updated 24 Aug 2018
 
 from datetime import datetime
 import matplotlib
@@ -110,8 +110,6 @@ def analyze(connection):
     marks_to_use = range(10, 90)
     marks_with = numpy.percentile(with_csc108, marks_to_use)
     marks_wo = numpy.percentile(wo_csc108, marks_to_use)
-
-    print marks_with
 
   # Create the QQ plot.
 
