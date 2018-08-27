@@ -17,6 +17,7 @@
 
 import json
 import numpy
+import scipy.stats
 import os
 import sqlite3
 
@@ -57,12 +58,30 @@ def analyze(connection):
         for row in cursor.execute(query):
             results.append(row["WaitTime"])
 
-        print "- Mean =   %s" % numpy.mean(results)
-        print "- Median = %s" % numpy.median(results)
-        print "- Sigma =  %s" % numpy.std(results)
-        print "- n =      %s" % len(results)
+        y = {
+            "mean": numpy.mean(results),
+            "median": numpy.median(results),
+            "sigma": numpy.std(results),
+            "n": len(results)
+        }
 
-        return results
+        print "- Mean =   %s" % y["mean"]
+        print "- Median = %s" % y["median"]
+        print "- Sigma =  %s" % y["sigma"]
+        print "- n =      %s" % y["n"]
+
+        return y
+
+    ###
+
+    def perform_t_test(before, after):
+
+        statistic, pvalue = scipy.stats.ttest_ind_from_stats(before["mean"],
+            before["sigma"], before["n"], after["mean"], after["sigma"],
+            after["n"], equal_var = False)
+  
+        print "Statistic: %s" % statistic
+        print "p-value: %s" % pvalue
 
     ###
 
@@ -71,7 +90,7 @@ def analyze(connection):
     end = 1533358800
 
     print "All bins before dormant period:"
-    query_for_non_csc108({
+    before = query_for_non_csc108({
         "lo_nodes": 1,
         "hi_nodes": 100000,
         "lo_time": start,
@@ -79,15 +98,26 @@ def analyze(connection):
     })
 
     print "All bins during dormant period:"
-    query_for_non_csc108({
+    after = query_for_non_csc108({
         "lo_nodes": 1,
         "hi_nodes": 100000,
         "lo_time": middle,
         "hi_time": end
     })
 
+    statistic, pvalue = scipy.stats.ttest_ind_from_stats(
+        before["mean"],
+        before["sigma"],
+        before["n"], after["mean"], after["sigma"], after["n"],
+        equal_var = False)
+
+    print "Statistic: %s" % statistic
+    print "p-value: %s" % pvalue
+
+    ###
+
     print "Bin 1 before dormant period:"
-    query_for_non_csc108({
+    before = query_for_non_csc108({
         "lo_nodes": 11250,
         "hi_nodes": 100000,
         "lo_time": start,
@@ -95,15 +125,26 @@ def analyze(connection):
     })
 
     print "Bin 1 during dormant period:"
-    query_for_non_csc108({
+    after = query_for_non_csc108({
         "lo_nodes": 11250,
         "hi_nodes": 100000,
         "lo_time": middle,
         "hi_time": end
     })
 
+    statistic, pvalue = scipy.stats.ttest_ind_from_stats(
+        before["mean"],
+        before["sigma"],
+        before["n"], after["mean"], after["sigma"], after["n"],
+        equal_var = False)
+
+    print "Statistic: %s" % statistic
+    print "p-value: %s" % pvalue
+
+    ###
+
     print "Bin 2 before dormant period:"
-    query_for_non_csc108({
+    before = query_for_non_csc108({
         "lo_nodes": 3750,
         "hi_nodes": 11249,
         "lo_time": start,
@@ -111,15 +152,26 @@ def analyze(connection):
     })
 
     print "Bin 2 during dormant period:"
-    query_for_non_csc108({
+    after = query_for_non_csc108({
         "lo_nodes": 3750,
         "hi_nodes": 11249,
         "lo_time": middle,
         "hi_time": end
     })
 
+    statistic, pvalue = scipy.stats.ttest_ind_from_stats(
+        before["mean"],
+        before["sigma"],
+        before["n"], after["mean"], after["sigma"], after["n"],
+        equal_var = False)
+
+    print "Statistic: %s" % statistic
+    print "p-value: %s" % pvalue
+
+    ###
+
     print "Bin 3 before dormant period:"
-    query_for_non_csc108({
+    before = query_for_non_csc108({
         "lo_nodes": 313,
         "hi_nodes": 3749,
         "lo_time": start,
@@ -127,15 +179,26 @@ def analyze(connection):
     })
 
     print "Bin 3 during dormant period:"
-    query_for_non_csc108({
+    after = query_for_non_csc108({
         "lo_nodes": 313,
         "hi_nodes": 3749,
         "lo_time": middle,
         "hi_time": end
     })
 
+    statistic, pvalue = scipy.stats.ttest_ind_from_stats(
+        before["mean"],
+        before["sigma"],
+        before["n"], after["mean"], after["sigma"], after["n"],
+        equal_var = False)
+
+    print "Statistic: %s" % statistic
+    print "p-value: %s" % pvalue
+
+    ###
+
     print "Bin 4 before dormant period:"
-    query_for_non_csc108({
+    before = query_for_non_csc108({
         "lo_nodes": 126,
         "hi_nodes": 312,
         "lo_time": start,
@@ -143,15 +206,26 @@ def analyze(connection):
     })
 
     print "Bin 4 during dormant period:"
-    query_for_non_csc108({
+    after = query_for_non_csc108({
         "lo_nodes": 126,
         "hi_nodes": 312,
         "lo_time": middle,
         "hi_time": end
     })
 
+    statistic, pvalue = scipy.stats.ttest_ind_from_stats(
+        before["mean"],
+        before["sigma"],
+        before["n"], after["mean"], after["sigma"], after["n"],
+        equal_var = False)
+
+    print "Statistic: %s" % statistic
+    print "p-value: %s" % pvalue
+
+    ###
+
     print "Bin 5 before dormant period:"
-    query_for_non_csc108({
+    before = query_for_non_csc108({
         "lo_nodes": 1,
         "hi_nodes": 125,
         "lo_time": start,
@@ -159,12 +233,21 @@ def analyze(connection):
     })
 
     print "Bin 5 during dormant period:"
-    query_for_non_csc108({
+    after = query_for_non_csc108({
         "lo_nodes": 1,
         "hi_nodes": 125,
         "lo_time": middle,
         "hi_time": end
     })
+
+    statistic, pvalue = scipy.stats.ttest_ind_from_stats(
+        before["mean"],
+        before["sigma"],
+        before["n"], after["mean"], after["sigma"], after["n"],
+        equal_var = False)
+
+    print "Statistic: %s" % statistic
+    print "p-value: %s" % pvalue
 
 ###
 
