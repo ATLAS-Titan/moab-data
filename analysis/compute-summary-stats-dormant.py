@@ -13,7 +13,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 24 Aug 2018
-#                                                   ~~ last updated 24 Aug 2018
+#                                                   ~~ last updated 27 Aug 2018
 
 import json
 import numpy
@@ -28,7 +28,7 @@ def analyze(connection):
 
     ###
 
-    def with_csc108(params):
+    def query_for_non_csc108(params):
 
         query = """
             SELECT DISTINCT
@@ -71,7 +71,7 @@ def analyze(connection):
     end = 1533358800
 
     print "All bins before dormant period:"
-    with_csc108({
+    query_for_non_csc108({
         "lo_nodes": 1,
         "hi_nodes": 100000,
         "lo_time": start,
@@ -79,7 +79,7 @@ def analyze(connection):
     })
 
     print "All bins during dormant period:"
-    with_csc108({
+    query_for_non_csc108({
         "lo_nodes": 1,
         "hi_nodes": 100000,
         "lo_time": middle,
@@ -87,7 +87,7 @@ def analyze(connection):
     })
 
     print "Bin 1 before dormant period:"
-    with_csc108({
+    query_for_non_csc108({
         "lo_nodes": 11250,
         "hi_nodes": 100000,
         "lo_time": start,
@@ -95,7 +95,7 @@ def analyze(connection):
     })
 
     print "Bin 1 during dormant period:"
-    with_csc108({
+    query_for_non_csc108({
         "lo_nodes": 11250,
         "hi_nodes": 100000,
         "lo_time": middle,
@@ -103,7 +103,7 @@ def analyze(connection):
     })
 
     print "Bin 2 before dormant period:"
-    with_csc108({
+    query_for_non_csc108({
         "lo_nodes": 3750,
         "hi_nodes": 11249,
         "lo_time": start,
@@ -111,7 +111,7 @@ def analyze(connection):
     })
 
     print "Bin 2 during dormant period:"
-    with_csc108({
+    query_for_non_csc108({
         "lo_nodes": 3750,
         "hi_nodes": 11249,
         "lo_time": middle,
@@ -119,7 +119,7 @@ def analyze(connection):
     })
 
     print "Bin 3 before dormant period:"
-    with_csc108({
+    query_for_non_csc108({
         "lo_nodes": 313,
         "hi_nodes": 3749,
         "lo_time": start,
@@ -127,7 +127,7 @@ def analyze(connection):
     })
 
     print "Bin 3 during dormant period:"
-    with_csc108({
+    query_for_non_csc108({
         "lo_nodes": 313,
         "hi_nodes": 3749,
         "lo_time": middle,
@@ -135,7 +135,7 @@ def analyze(connection):
     })
 
     print "Bin 4 before dormant period:"
-    with_csc108({
+    query_for_non_csc108({
         "lo_nodes": 126,
         "hi_nodes": 312,
         "lo_time": start,
@@ -143,7 +143,7 @@ def analyze(connection):
     })
 
     print "Bin 4 during dormant period:"
-    with_csc108({
+    query_for_non_csc108({
         "lo_nodes": 126,
         "hi_nodes": 312,
         "lo_time": middle,
@@ -151,7 +151,7 @@ def analyze(connection):
     })
 
     print "Bin 5 before dormant period:"
-    with_csc108({
+    query_for_non_csc108({
         "lo_nodes": 1,
         "hi_nodes": 125,
         "lo_time": start,
@@ -159,7 +159,7 @@ def analyze(connection):
     })
 
     print "Bin 5 during dormant period:"
-    with_csc108({
+    query_for_non_csc108({
         "lo_nodes": 1,
         "hi_nodes": 125,
         "lo_time": middle,
