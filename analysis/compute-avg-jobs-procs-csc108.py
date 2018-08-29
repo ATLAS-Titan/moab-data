@@ -2,7 +2,7 @@
 
 #-  compute-avg-jobs-procs-csc108.py ~~
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 29 Aug 2018
 
 import os
 import sqlite3
@@ -14,10 +14,17 @@ def analyze(connection):
     cursor = connection.cursor()
 
     query = """
-        SELECT count(*) As Jobs, sum(ReqProcs) AS Procs
-            FROM active
-            WHERE Account="CSC108" AND User="doleynik"
-            GROUP BY SampleID;
+        SELECT  count(*) As Jobs,
+                sum(ReqProcs) AS Procs
+            FROM
+                active
+            WHERE
+                Account = "CSC108"
+                AND User = "doleynik"
+                AND JobName LIKE "SAGA-Python-PBSJobScript.%"
+            GROUP BY
+                SampleID
+        ;
         """
 
     jobs = []

@@ -6,7 +6,7 @@
 #   being run by CSC108 in backfill mode on Titan.
 #
 #                                                       ~~ (c) SRW, 16 Jun 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 29 Aug 2018
 
 import os
 import sqlite3
@@ -18,12 +18,18 @@ def analyze(connection):
     cursor = connection.cursor()
 
     query = """
-        SELECT count(DISTINCT SampleID) AS n
-            FROM active
-            WHERE SampleID NOT IN (
-                SELECT SampleID
-                    FROM active
-                    WHERE Account = "CSC108" AND User = "doleynik"
+        SELECT  count(DISTINCT SampleID) AS n
+            FROM
+                active
+            WHERE
+                SampleID NOT IN (
+                    SELECT  SampleID
+                        FROM
+                            active
+                        WHERE
+                            Account = "CSC108"
+                            AND User = "doleynik"
+                            AND JobName LIKE "SAGA-Python-PBSJobScript.%"
             )
         ;
         """
@@ -32,8 +38,9 @@ def analyze(connection):
         no_csc108 = row["n"]
 
     query = """
-        SELECT count(DISTINCT SampleID) AS n
-            FROM active
+        SELECT  count(DISTINCT SampleID) AS n
+            FROM
+                active
         ;
         """
 

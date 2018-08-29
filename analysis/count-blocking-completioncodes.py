@@ -7,7 +7,7 @@
 #   times did each code appear?"
 #
 #                                                       ~~ (c) SRW, 25 Jul 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 29 Aug 2018
 
 import os
 import sqlite3
@@ -21,40 +21,50 @@ def analyze(connection):
     query = """
         WITH
             blocked AS (
-                SELECT *
-                    FROM eligible
+                SELECT  *
+                    FROM
+                        eligible
                     INNER JOIN (
-                        SELECT SampleID, sum(ReqProcs) AS procs
-                            FROM csc108
-                            GROUP BY SampleID
+                        SELECT  SampleID,
+                                sum(ReqProcs) AS procs
+                            FROM
+                                csc108
+                            GROUP BY
+                                SampleID
                     ) bp ON eligible.SampleID = bp.SampleID
                     INNER JOIN backfill ON
                         backfill.SampleID = eligible.SampleID
                     WHERE
                         eligible.ReqAWDuration < backfill.duration
-                        AND
-                        eligible.ReqProcs < (backfill.proccount + bp.procs)
-                        AND
-                        backfill.starttime = backfill.SampleTime
-                        AND
-                        eligible.EEDuration > 0
-                        AND
-                        eligible.Class = "batch"
+                        AND eligible.ReqProcs < (backfill.proccount + bp.procs)
+                        AND backfill.starttime = backfill.SampleTime
+                        AND eligible.EEDuration > 0
+                        AND eligible.Class = "batch"
             ),
             blocking AS (
-                SELECT *
-                    FROM csc108
-                    WHERE SampleID IN (SELECT SampleID FROM blocked)
+                SELECT  *
+                    FROM
+                        csc108
+                    WHERE
+                        SampleID IN (SELECT SampleID FROM blocked)
             ),
             csc108 AS (
-                SELECT *
-                    FROM active
-                    WHERE Account = "CSC108" AND User = "doleynik"
+                SELECT  *
+                    FROM
+                        active
+                    WHERE
+                        Account = "CSC108"
+                        AND User = "doleynik"
+                        AND JobName LIKE "SAGA-Python-PBSJobScript.%"
             )
-        SELECT CompletionCode AS code, count(CompletionCode) AS n
-            FROM completed
-            WHERE JobID IN (SELECT JobID FROM blocking)
-            GROUP BY CompletionCode
+        SELECT  CompletionCode AS code,
+                count(CompletionCode) AS n
+            FROM
+                completed
+            WHERE
+                JobID IN (SELECT JobID FROM blocking)
+            GROUP BY
+                CompletionCode
         ;
         """
 

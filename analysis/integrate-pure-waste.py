@@ -8,7 +8,7 @@
 #   start and the start of the next job owned by another project.
 #
 #                                                       ~~ (c) SRW, 09 Aug 2018
-#                                                   ~~ last updated 17 Aug 2018
+#                                                   ~~ last updated 29 Aug 2018
 
 import os
 import sqlite3
@@ -32,6 +32,7 @@ def analyze(connection):
             WHERE
                 Account = "CSC108"
                 AND User = "doleynik"
+                AND JobName LIKE "SAGA-Python-PBSJobScript.%"
                 --AND StartTime > (strftime('%s','now') - 1*24*60*60)
             ORDER BY
                 StartTime

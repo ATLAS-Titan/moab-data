@@ -8,7 +8,7 @@
 #   as a way to check that the numbers are coming out as expected.
 #
 #                                                       ~~ (c) SRW, 20 Jun 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 29 Aug 2018
 
 import json
 import os
@@ -32,8 +32,12 @@ def analyze(connection):
         FROM active
         INNER JOIN cluster ON
             active.SampleID = cluster.SampleID
-        WHERE active.Account="CSC108" AND active.User="doleynik"
-        GROUP BY active.SampleID
+        WHERE
+            active.Account = "CSC108"
+            AND active.User = "doleynik"
+            AND active.JobName LIKE "SAGA-Python-PBSJobScript.%"
+        GROUP BY
+            active.SampleID
         ;
         """
 

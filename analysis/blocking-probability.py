@@ -18,7 +18,7 @@
 #   1) in SampleID versus SampleTime, however, is not yet explained.
 #
 #                                                       ~~ (c) SRW, 21 Jun 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 29 Aug 2018
 
 import os
 import sqlite3
@@ -41,10 +41,16 @@ def analyze(connection):
         FROM eligible
 
         INNER JOIN (
-            SELECT SampleID, sum(ReqProcs) AS procs
-                FROM active
-                WHERE Account="CSC108" AND User="doleynik"
-                GROUP BY SampleID
+            SELECT  SampleID,
+                    sum(ReqProcs) AS procs
+                FROM
+                    active
+                WHERE
+                    Account = "CSC108"
+                    AND User = "doleynik"
+                    AND JobName LIKE "SAGA-Python-PBSJobScript.%"
+                GROUP BY
+                    SampleID
         ) csc108 ON eligible.SampleID = csc108.SampleID
 
         INNER JOIN backfill ON
@@ -55,16 +61,12 @@ def analyze(connection):
 
         WHERE
             eligible.ReqAWDuration < backfill.duration
-            AND
          -- This is still not right, though, because the CSC108 processors do
          -- not take duration into account here ...
-            eligible.ReqProcs < (backfill.proccount + csc108.procs)
-            AND
-            backfill.starttime = backfill.SampleTime
-            AND
-            eligible.EEDuration > 0
-            AND
-            eligible.Class = "batch"
+            AND eligible.ReqProcs < (backfill.proccount + csc108.procs)
+            AND backfill.starttime = backfill.SampleTime
+            AND eligible.EEDuration > 0
+            AND eligible.Class = "batch"
         ;
         """
 
@@ -75,8 +77,9 @@ def analyze(connection):
             num_blocked
 
     query = """
-        SELECT count(DISTINCT eligible.SampleID) AS n
-        FROM eligible
+        SELECT  count(DISTINCT eligible.SampleID) AS n
+            FROM
+                eligible
         ;
         """
 

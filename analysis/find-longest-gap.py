@@ -10,7 +10,7 @@
 #   out yet.
 #
 #                                                       ~~ (c) SRW, 03 Aug 2018
-#                                                   ~~ last updated 07 Aug 2018
+#                                                   ~~ last updated 29 Aug 2018
 
 from datetime import datetime
 
@@ -25,10 +25,14 @@ def analyze(connection):
     cursor = connection.cursor()
 
     query = """
-        SELECT SampleID, SampleTime
-            FROM active
+        SELECT  SampleID,
+                SampleTime
+            FROM
+                active
             WHERE
-                Account = "CSC108" AND User = "doleynik"
+                Account = "CSC108"
+                AND User = "doleynik"
+                AND JobName LIKE "SAGA-Python-PBSJobScript.%"
             ORDER BY
                 SampleTime
         """

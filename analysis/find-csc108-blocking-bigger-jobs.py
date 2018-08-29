@@ -8,7 +8,7 @@
 #   actually ended up doing.
 #
 #                                                       ~~ (c) SRW, 09 Aug 2018
-#                                                   ~~ last updated 09 Aug 2018
+#                                                   ~~ last updated 29 Aug 2018
 
 import os
 import sqlite3
@@ -81,12 +81,16 @@ def analyze(connection):
     query = """
         WITH
             blocked AS (
-                SELECT *
-                    FROM eligible
+                SELECT  *
+                    FROM
+                        eligible
                     INNER JOIN (
-                        SELECT SampleID, sum(ReqProcs) AS procs
-                            FROM csc108
-                            GROUP BY SampleID
+                        SELECT  SampleID,
+                                sum(ReqProcs) AS procs
+                            FROM
+                                csc108
+                            GROUP BY
+                                SampleID
                     ) bp ON eligible.SampleID = bp.SampleID
                     INNER JOIN backfill ON
                         backfill.SampleID = eligible.SampleID
@@ -100,20 +104,28 @@ def analyze(connection):
             ),
 
             blocking AS (
-                SELECT *
-                    FROM csc108
-                    WHERE SampleID IN (SELECT SampleID FROM blocked)
+                SELECT  *
+                    FROM
+                        csc108
+                    WHERE
+                        SampleID IN (SELECT SampleID FROM blocked)
             ),
 
             csc108 AS (
-                SELECT *
-                    FROM active
-                    WHERE Account = "CSC108" AND User = "doleynik"
+                SELECT  *
+                    FROM
+                        active
+                    WHERE
+                        Account = "CSC108"
+                        AND User = "doleynik"
+                        AND JobName LIKE "SAGA-Python-PBSJobScript.%"
             )
 
-        SELECT min(SampleTime - StartTime) AS ttfb
-            FROM blocking
-            GROUP BY JobID
+        SELECT  min(SampleTime - StartTime) AS ttfb
+            FROM
+                blocking
+            GROUP BY
+                JobID
         ;
         """
 
@@ -127,9 +139,14 @@ def analyze(connection):
     print 'Number of "big blocks" (bins 1,2): %s' % (len(times))
 
     query = """
-        SELECT count(DISTINCT JobID) AS total_jobs
-            FROM active
-            WHERE Account = "CSC108" AND User = "doleynik";
+        SELECT  count(DISTINCT JobID) AS total_jobs
+            FROM
+                active
+            WHERE
+                Account = "CSC108"
+                AND User = "doleynik"
+                AND JobName LIKE "SAGA-Python-PBSJobScript.%"
+        ;
         """
 
     for row in cursor.execute(query):
@@ -153,6 +170,7 @@ def analyze(connection):
             WHERE
                 active.Account = "CSC108"
                 AND active.User = "doleynik"
+                AND active.JobName LIKE "SAGA-Python-PBSJobScript.%"
                 AND active.ReqProcs < eligible.ReqProcs
                 --AND (eligible.ReqProcs / 16.0) >= 3750
         ;
@@ -169,14 +187,17 @@ def analyze(connection):
   # was already running.
 
     query = """
-        SELECT count(DISTINCT A.JobID)
+        SELECT  count(DISTINCT A.JobID)
             FROM
                 active A, active B
             WHERE
                 A.SampleID = B.SampleID
                 AND A.Account = "CSC108"
                 AND A.User = "doleynik"
-                AND (B.Account != "CSC108" OR B.User != "doleynik")
+                AND A.JobName LIKE "SAGA-Python-PBSJobScript.%"
+                AND (B.Account != "CSC108"
+                    OR B.User != "doleynik"
+                    OR B.JobName NOT LIKE "SAGA-Python-PBSJobScript.%")
                 AND A.ReqProcs < B.ReqProcs
                 AND A.StartTime < B.StartTime
                 AND A.Class = "batch"

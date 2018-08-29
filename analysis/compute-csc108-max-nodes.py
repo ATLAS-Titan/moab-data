@@ -6,7 +6,7 @@
 #   There are prettier ways to do it, but I'm in a hurry.
 #
 #                                                       ~~ (c) SRW, 28 Aug 2018
-#                                                   ~~ last updated 28 Aug 2018
+#                                                   ~~ last updated 29 Aug 2018
 
 import os
 import sqlite3
@@ -34,6 +34,7 @@ def analyze(connection):
                     WHERE
                         Account = "CSC108"
                         AND User = "doleynik"
+                        AND JobName LIKE "SAGA-Python-PBSJobScript.%"
             )
         ;
         """
@@ -56,6 +57,7 @@ def analyze(connection):
                 SampleID = "{id}"
                 AND Account = "CSC108"
                 AND User = "doleynik"
+                AND JobName LIKE "SAGA-Python-PBSJobScript.%"
         ;
         """.format(id = id)
 
