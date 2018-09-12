@@ -14,8 +14,9 @@
 #   what the group has used elsewhere in the BigPanDA project as well.
 #
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 12 Sep 2018
 
+#import json
 import os
 import sqlite3
 from xml.etree import ElementTree
@@ -175,11 +176,11 @@ def initializeDatabase(connection):
             Account STRING NOT NULL,
             AWDuration INTEGER,
             Class STRING NOT NULL,
-            DRMJID INTEGER NOT NULL,
+            DRMJID INTEGER,
             EEDuration INTEGER,
             GJID INTEGER NOT NULL,
             Group_ STRING NOT NULL,
-            JobID INTEGER NOT NULL,
+            JobID STRING NOT NULL,
             JobName STRING NOT NULL,
             MasterHost INTEGER,
             PAL STRING,
@@ -204,8 +205,8 @@ def initializeDatabase(connection):
 
              -- This can probably simplify to SampleID, SampleTime, JobID ...
 
-                SampleID, SampleTime, Account, Class, DRMJID, GJID, Group_,
-                JobID, JobName, QOS, ReqAWDuration, ReqProcs, RunPriority,
+                SampleID, SampleTime, Account, Class, GJID, Group_, JobID,
+                JobName, QOS, ReqAWDuration, ReqProcs, RunPriority,
                 StartPriority, StartTime, State, StatPSDed, StatPSUtl,
                 SubmissionTime, SuspendDuration, User
             ),
@@ -254,11 +255,11 @@ def initializeDatabase(connection):
 
             Account STRING NOT NULL,
             Class STRING NOT NULL,
-            DRMJID INTEGER NOT NULL,
+            DRMJID INTEGER,
             EEDuration INTEGER,
             GJID INTEGER NOT NULL,
             Group_ STRING NOT NULL,
-            JobID INTEGER NOT NULL,
+            JobID STRING NOT NULL,
             JobName STRING NOT NULL,
             QOS STRING NOT NULL,
             ReqAWDuration INTEGER NOT NULL,
@@ -276,8 +277,8 @@ def initializeDatabase(connection):
 
              -- This can probably simplify to SampleID, SampleTime, JobID ...
 
-                SampleID, SampleTime, Account, Class, DRMJID, GJID, Group_,
-                JobID, JobName, QOS, ReqAWDuration, ReqProcs, StartPriority,
+                SampleID, SampleTime, Account, Class, GJID, Group_, JobID,
+                JobName, QOS, ReqAWDuration, ReqProcs, StartPriority,
                 StartTime, State, SubmissionTime, SuspendDuration, User
 
             ),
@@ -336,11 +337,11 @@ def initializeDatabase(connection):
             Class STRING NOT NULL,
             CompletionCode STRING NOT NULL, -- because "CNCLD" can occur
             CompletionTime INTEGER NOT NULL,
-            DRMJID INTEGER NOT NULL,
+            DRMJID INTEGER,
             EEDuration INTEGER,
             GJID INTEGER NOT NULL,
             Group_ STRING NOT NULL,
-            JobID INTEGER NOT NULL PRIMARY KEY,
+            JobID STRING NOT NULL PRIMARY KEY,
             JobName STRING NOT NULL,
             MasterHost INTEGER,
             PAL STRING,
@@ -370,11 +371,11 @@ def initializeDatabase(connection):
 
             Account STRING NOT NULL,
             Class STRING NOT NULL,
-            DRMJID INTEGER NOT NULL,
+            DRMJID INTEGER,
             EEDuration INTEGER,
             GJID INTEGER NOT NULL,
             Group_ STRING NOT NULL,
-            JobID INTEGER NOT NULL,
+            JobID STRING NOT NULL,
             JobName STRING NOT NULL,
             QOS STRING NOT NULL,
             ReqAWDuration INTEGER NOT NULL,
@@ -393,8 +394,8 @@ def initializeDatabase(connection):
 
              -- This can probably simplify to SampleID, SampleTime, JobID ...
 
-                SampleID, SampleTime, Account, Class, DRMJID, GJID, Group_,
-                JobID, JobName, QOS, ReqAWDuration, ReqProcs, StartPriority,
+                SampleID, SampleTime, Account, Class, GJID, Group_, JobID,
+                JobName, QOS, ReqAWDuration, ReqProcs, StartPriority,
                 StartTime, State, SubmissionTime, SuspendDuration, User
 
             ),
