@@ -19,7 +19,7 @@
 #   in the file is a commented line.
 #
 #                                                       ~~ (c) SRW, 18 Jun 2018
-#                                                   ~~ last updated 22 Jun 2018
+#                                                   ~~ last updated 12 Sep 2018
 #
 #-  Charge to the CSC108 project's account.
 #PBS -A CSC108
@@ -27,8 +27,10 @@
 #-  Combine standard output and standard error into the standard out file.
 #PBS -j oe
 #
-#-  Use one node on the Rhea partition for no more than 10 minutes.
-#PBS -l nodes=1,partition=rhea,walltime=0:10:00
+#-  Use one node on the Rhea partition for no more than 1 hour. There is no
+#   reason it should ever take longer than 5-10 minutes, but this helps ensure
+#   the job won't be killed.
+#PBS -l nodes=1,partition=rhea,walltime=1:00:00
 #
 #-  Use Sean's CERN email for status updates
 #PBS -M sean.wilkinson@cern.ch
@@ -43,6 +45,5 @@
 #-  Send the standard output to the null device.
 #PBS -o /dev/null
 
-/usr/bin/python2 ${HOME}/moab-data--git/collection/from-xml-to-sqlite.py
-
+/usr/bin/python2 ${HOME}/moab-data--git/collection/from-xml-to-sqlite.py 
 #-  vim:set syntax=sh:
