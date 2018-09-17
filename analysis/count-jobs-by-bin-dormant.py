@@ -7,7 +7,7 @@
 #   running any ATLAS jobs on Titan.
 #
 #                                                       ~~ (c) SRW, 23 Aug 2018
-#                                                   ~~ last updated 23 Aug 2018
+#                                                   ~~ last updated 17 Sep 2018
 
 import json
 import os
@@ -21,7 +21,7 @@ def analyze(connection):
 
     ###
 
-    def count_between(left, right):
+    def count_between(num_a, num_b, time_a, time_b):
 
         query = """
             SELECT count(DISTINCT JobID) AS n
@@ -30,15 +30,15 @@ def analyze(connection):
                 WHERE
                     SubmissionTime <= StartTime
                     AND ((ReqNodes IS NULL
-                            AND {left} <= (ReqProcs / 16)
-                            AND (ReqProcs / 16) <= {right})
+                            AND {na} <= (ReqProcs / 16)
+                            AND (ReqProcs / 16) <= {nb})
                         OR (ReqNodes IS NOT NULL
-                            AND {left} <= ReqNodes
-                            AND ReqNodes <= {right}))
+                            AND {na} <= ReqNodes
+                            AND ReqNodes <= {nb}))
                  -- An estimate for July 21 through August 4
-                    AND (1532149200 < SampleTime AND SampleTime < 1533358800)
+                    AND ({ta} < SampleTime AND SampleTime < {tb})
             ;
-            """.format(left = left, right = right)
+            """.format(na = num_a, nb = num_b, ta = time_a, tb = time_b)
 
         n = None
         for row in cursor.execute(query):
@@ -48,12 +48,29 @@ def analyze(connection):
 
     ###
 
-    print "# of all jobs: %s" % count_between(1, 20000)
-    print "# of bin 1 jobs: %s" % count_between(11250, 20000)
-    print "# of bin 2 jobs: %s" % count_between(3750, 11249)
-    print "# of bin 3 jobs: %s" % count_between(313, 3749)
-    print "# of bin 4 jobs: %s" % count_between(126, 312)
-    print "# of bin 5 jobs: %s" % count_between(1, 125)
+    print "# of all jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
+        count_between(1, 20000, 1530939600, 1532149200),
+        count_between(1, 20000, 1532149200, 1533358800))
+
+    print "# of bin 1 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
+        count_between(11250, 20000, 1530939600, 1532149200),
+        count_between(11250, 20000, 1532149200, 1533358800))
+
+    print "# of bin 2 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
+        count_between(3750, 11249, 1530939600, 1532149200),
+        count_between(3750, 11249, 1532149200, 1533358800))
+
+    print "# of bin 3 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
+        count_between(313, 3749, 1530939600, 1532149200),
+        count_between(313, 3749, 1532149200, 1533358800))
+
+    print "# of bin 4 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
+        count_between(126, 312, 1530939600, 1532149200),
+        count_between(126, 312, 1532149200, 1533358800))
+
+    print "# of bin 5 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
+        count_between(1, 125, 1530939600, 1532149200),
+        count_between(1, 125, 1532149200, 1533358800))
 
 ###
 
