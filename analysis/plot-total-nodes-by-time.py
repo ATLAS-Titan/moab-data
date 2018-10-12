@@ -13,6 +13,7 @@
 
 from datetime import datetime
 import matplotlib.pyplot as pyplot
+from matplotlib.pyplot import *
 import os
 import sqlite3
 
@@ -25,7 +26,10 @@ def analyze(connection):
     query = """
         SELECT SampleTime, sum(ReqProcs / 16) AS nodes
             FROM active
-            WHERE Account = "CSC108" AND User = "doleynik"
+            WHERE
+                Account = "CSC108"
+                AND User = "doleynik"
+                AND JobName LIKE "SAGA-Python-PBSJobScript.%"
             GROUP BY SampleID
         ;
         """
@@ -40,7 +44,10 @@ def analyze(connection):
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
 
+    rcParams['font'] = 'Arial'
+
     ax.plot_date(times, nodes, linestyle="none", marker="o")
+
 
   # Angle the x-axis labels so that the dates don't overlap so badly
     pyplot.gcf().autofmt_xdate()
