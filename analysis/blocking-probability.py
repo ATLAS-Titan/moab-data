@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  blocking-probability.py ~~
 #
@@ -18,7 +18,7 @@
 #   1) in SampleID versus SampleTime, however, is not yet explained.
 #
 #                                                       ~~ (c) SRW, 21 Jun 2018
-#                                                   ~~ last updated 29 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -73,8 +73,8 @@ def analyze(connection):
     num_blocked = 0
     for row in cursor.execute(query):
         num_blocked = row["n"]
-        print "Number of sample times in which >= 1 job was blocked: %s" % \
-            num_blocked
+        print("Number of sample times in which >= 1 job was blocked: %s" % (
+            num_blocked))
 
     query = """
         SELECT  count(DISTINCT eligible.SampleID) AS n
@@ -86,10 +86,10 @@ def analyze(connection):
     num_total = 0
     for row in cursor.execute(query):
         num_total = row["n"]
-        print "Total number of sample times: %s" % num_total
+        print("Total number of sample times: %s" % num_total)
 
-    print "=> The blocking probability is ~ %s." % \
-        round(float(num_blocked) / num_total, 2)
+    print("=> The blocking probability is ~ %s." % (
+        round(float(num_blocked) / num_total, 2)))
 
 ###
 
@@ -107,7 +107,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

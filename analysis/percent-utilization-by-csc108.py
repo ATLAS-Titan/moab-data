@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  percent-utilization-by-csc108.py ~~
 #
@@ -8,7 +8,7 @@
 #   as a way to check that the numbers are coming out as expected.
 #
 #                                                       ~~ (c) SRW, 20 Jun 2018
-#                                                   ~~ last updated 29 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import json
 import os
@@ -56,9 +56,9 @@ def analyze(connection):
         total_procs.append(row["total_procs"])
 
     def prettyprint(title, x):
-        print "%s: %s" % \
+        print("%s: %s" % \
             (title, json.dumps({"max": max(x), "mean": mean(x), "min": min(x)},
-                indent=4))
+                indent=4)))
 
     prettyprint("Jobs on Titan by CSC108", jobs)
     prettyprint("Processors in use by CSC108", procs)
@@ -81,7 +81,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

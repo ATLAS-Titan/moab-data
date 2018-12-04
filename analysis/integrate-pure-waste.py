@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  integrate-pure-waste.py ~~
 #
@@ -8,7 +8,7 @@
 #   start and the start of the next job owned by another project.
 #
 #                                                       ~~ (c) SRW, 09 Aug 2018
-#                                                   ~~ last updated 29 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -80,8 +80,10 @@ def analyze(connection):
         dt = (other[index]["StartTime"] - csc108_job["StartTime"]) / 3600.0
         waste.append(csc108_job["nodes"] * dt)
 
-    print "Waste (in node-hours):   %s" % (sum(waste))
-    print "Waste reclaimed per job: %s" % (sum(waste) / len(waste))
+    print("Waste (in node-hours):   %s" % (sum(waste)))
+    print("Waste reclaimed per job: %s" % (sum(waste) / len(waste)))
+
+    return
 
 ###
 
@@ -99,7 +101,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

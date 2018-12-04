@@ -1,11 +1,11 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  explore-nodes-and-procs.py ~~
 #
 #   This program explores the "cluster" table on a very preliminary level.
 #
 #                                                       ~~ (c) SRW, 19 Jun 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -26,10 +26,10 @@ def analyze(connection):
             vals.append(row["val"])
 
         if sum(vals) == 0:
-            print "All values of %s are 0." % fieldname
+            print("All values of %s are 0." % fieldname)
         else:
             avg_val = int(round(float(sum(vals) / len(vals))))
-            print "Average %s: ~%s" % (fieldname, avg_val)
+            print("Average %s: ~%s" % (fieldname, avg_val))
 
     ###
 
@@ -60,7 +60,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  compute-csc108-max-nodes.py ~~
 #
@@ -6,7 +6,7 @@
 #   There are prettier ways to do it, but I'm in a hurry.
 #
 #                                                       ~~ (c) SRW, 28 Aug 2018
-#                                                   ~~ last updated 29 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -47,8 +47,8 @@ def analyze(connection):
         nodes = row["n"]
         time = row["time"]
 
-    print "SampleID: %s (%s)" % (id, time)
-    print "# of nodes: %s" % (nodes)
+    print("SampleID: %s (%s)" % (id, time))
+    print("# of nodes: %s" % (nodes))
 
     query = """
         SELECT count(DISTINCT JobID) AS n
@@ -62,7 +62,7 @@ def analyze(connection):
         """.format(id = id)
 
     for row in cursor.execute(query):
-        print "# of jobs: %s" % (row["n"])
+        print("# of jobs: %s" % (row["n"]))
 
 ###
 
@@ -80,7 +80,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

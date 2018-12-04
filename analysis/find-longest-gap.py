@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  find-longest-gap.py ~~
 #
@@ -10,7 +10,7 @@
 #   out yet.
 #
 #                                                       ~~ (c) SRW, 03 Aug 2018
-#                                                   ~~ last updated 29 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 from datetime import datetime
 
@@ -52,16 +52,16 @@ def analyze(connection):
 
     idx = deltas.index(max(deltas))
 
-    print json.dumps(data[idx - 1], indent = 4)
-    print json.dumps(data[idx], indent = 4)
+    print(json.dumps(data[idx - 1], indent = 4))
+    print(json.dumps(data[idx], indent = 4))
 
     left_time = datetime.utcfromtimestamp(data[idx - 1]["time"])
     right_time = datetime.utcfromtimestamp(data[idx]["time"])
 
-    print "Longest gap starts at %s" % left_time
-    print "Longest gap ends at %s" % right_time
+    print("Longest gap starts at %s" % left_time)
+    print("Longest gap ends at %s" % right_time)
 
-    print "Gap length is %s (%s hours)" % (max(deltas), max(deltas) / 3600.0)
+    print("Gap length is %s (%s hours)" % (max(deltas), max(deltas) / 3600.0))
 
 ###
 
@@ -79,7 +79,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

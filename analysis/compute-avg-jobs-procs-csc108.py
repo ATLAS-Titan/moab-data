@@ -1,8 +1,8 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  compute-avg-jobs-procs-csc108.py ~~
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 29 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -35,8 +35,8 @@ def analyze(connection):
 
     avg_jobs = int(round(float(sum(jobs)) / len(jobs)))
     avg_procs = int(round(float(sum(procs)) / len(procs)))
-    print "CSC108 is typically running ~%s backfill jobs on ~%s processors." % \
-        (avg_jobs, avg_procs)
+    print("CSC108 is typically running ~%s backfill jobs on ~%s processors." % (
+        avg_jobs, avg_procs))
 
 ###
 
@@ -54,7 +54,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

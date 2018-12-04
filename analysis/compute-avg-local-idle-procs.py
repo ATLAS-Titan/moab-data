@@ -1,8 +1,8 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  compute-avg-local-idle-procs.py ~~
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -25,8 +25,8 @@ def analyze(connection):
         procs.append(row["procs"])
 
     avg_procs = int(round(float(sum(procs)) / len(procs)))
-    print "There are ~%s 'local idle processors' at any given instant." % \
-        (avg_procs)
+    print("There are ~%s 'local idle processors' at any given instant." % (
+        avg_procs))
 
 ###
 
@@ -44,7 +44,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

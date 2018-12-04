@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  count-blocking-completioncodes.py ~~
 #
@@ -7,7 +7,7 @@
 #   times did each code appear?"
 #
 #                                                       ~~ (c) SRW, 25 Jul 2018
-#                                                   ~~ last updated 29 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -69,7 +69,7 @@ def analyze(connection):
         """
 
     for row in cursor.execute(query):
-        print 'Code "%s" occurred %s time(s).' % (row["code"], row["n"])
+        print('Code "%s" occurred %s time(s).' % (row["code"], row["n"]))
 
 ###
 
@@ -87,7 +87,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

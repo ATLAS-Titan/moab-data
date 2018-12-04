@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  show-diff-in-waiting-time.py ~~
 #
@@ -10,7 +10,7 @@
 #   CSC108 was not running any jobs for approximately 100 hours each.
 #
 #                                                       ~~ (c) SRW, 08 Aug 2018
-#                                                   ~~ last updated 08 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -44,8 +44,9 @@ def analyze(connection):
         results = {}
 
         for row in cursor.execute(query):
-            print caption
-            print "Avg wait: %s (%s jobs)" % (row["avg_wait"], row["num_jobs"])
+            print(caption)
+            print("Avg wait: %s (%s jobs)" % (
+                row["avg_wait"], row["num_jobs"]))
 
     ###
 
@@ -75,7 +76,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  compute-summary-stats-dormant.py ~~
 #
@@ -13,7 +13,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 24 Aug 2018
-#                                                   ~~ last updated 27 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import json
 import numpy
@@ -65,10 +65,10 @@ def analyze(connection):
             "n": len(results)
         }
 
-        print "- Mean =   %s" % y["mean"]
-        print "- Median = %s" % y["median"]
-        print "- Sigma =  %s" % y["sigma"]
-        print "- n =      %s" % y["n"]
+        print("- Mean =   %s" % y["mean"])
+        print("- Median = %s" % y["median"])
+        print("- Sigma =  %s" % y["sigma"])
+        print("- n =      %s" % y["n"])
 
         return y
 
@@ -80,8 +80,8 @@ def analyze(connection):
             before["sigma"], before["n"], after["mean"], after["sigma"],
             after["n"], equal_var = False)
   
-        print "Statistic: %s" % statistic
-        print "p-value: %s" % pvalue
+        print("Statistic: %s" % statistic)
+        print("p-value: %s" % pvalue)
 
     ###
 
@@ -89,7 +89,7 @@ def analyze(connection):
     middle = 1532149200
     end = 1533358800
 
-    print "All bins before dormant period:"
+    print("All bins before dormant period:")
     before = query_for_non_csc108({
         "lo_nodes": 1,
         "hi_nodes": 100000,
@@ -97,7 +97,7 @@ def analyze(connection):
         "hi_time": middle
     })
 
-    print "All bins during dormant period:"
+    print("All bins during dormant period:")
     after = query_for_non_csc108({
         "lo_nodes": 1,
         "hi_nodes": 100000,
@@ -111,12 +111,12 @@ def analyze(connection):
         before["n"], after["mean"], after["sigma"], after["n"],
         equal_var = False)
 
-    print "Statistic: %s" % statistic
-    print "p-value: %s" % pvalue
+    print("Statistic: %s" % statistic)
+    print("p-value: %s" % pvalue)
 
     ###
 
-    print "Bin 1 before dormant period:"
+    print("Bin 1 before dormant period:")
     before = query_for_non_csc108({
         "lo_nodes": 11250,
         "hi_nodes": 100000,
@@ -124,7 +124,7 @@ def analyze(connection):
         "hi_time": middle
     })
 
-    print "Bin 1 during dormant period:"
+    print("Bin 1 during dormant period:")
     after = query_for_non_csc108({
         "lo_nodes": 11250,
         "hi_nodes": 100000,
@@ -138,12 +138,12 @@ def analyze(connection):
         before["n"], after["mean"], after["sigma"], after["n"],
         equal_var = False)
 
-    print "Statistic: %s" % statistic
-    print "p-value: %s" % pvalue
+    print("Statistic: %s" % statistic)
+    print("p-value: %s" % pvalue)
 
     ###
 
-    print "Bin 2 before dormant period:"
+    print("Bin 2 before dormant period:")
     before = query_for_non_csc108({
         "lo_nodes": 3750,
         "hi_nodes": 11249,
@@ -151,7 +151,7 @@ def analyze(connection):
         "hi_time": middle
     })
 
-    print "Bin 2 during dormant period:"
+    print("Bin 2 during dormant period:")
     after = query_for_non_csc108({
         "lo_nodes": 3750,
         "hi_nodes": 11249,
@@ -165,12 +165,12 @@ def analyze(connection):
         before["n"], after["mean"], after["sigma"], after["n"],
         equal_var = False)
 
-    print "Statistic: %s" % statistic
-    print "p-value: %s" % pvalue
+    print("Statistic: %s" % statistic)
+    print("p-value: %s" % pvalue)
 
     ###
 
-    print "Bin 3 before dormant period:"
+    print("Bin 3 before dormant period:")
     before = query_for_non_csc108({
         "lo_nodes": 313,
         "hi_nodes": 3749,
@@ -178,7 +178,7 @@ def analyze(connection):
         "hi_time": middle
     })
 
-    print "Bin 3 during dormant period:"
+    print("Bin 3 during dormant period:")
     after = query_for_non_csc108({
         "lo_nodes": 313,
         "hi_nodes": 3749,
@@ -192,12 +192,12 @@ def analyze(connection):
         before["n"], after["mean"], after["sigma"], after["n"],
         equal_var = False)
 
-    print "Statistic: %s" % statistic
-    print "p-value: %s" % pvalue
+    print("Statistic: %s" % statistic)
+    print("p-value: %s" % pvalue)
 
     ###
 
-    print "Bin 4 before dormant period:"
+    print("Bin 4 before dormant period:")
     before = query_for_non_csc108({
         "lo_nodes": 126,
         "hi_nodes": 312,
@@ -205,7 +205,7 @@ def analyze(connection):
         "hi_time": middle
     })
 
-    print "Bin 4 during dormant period:"
+    print("Bin 4 during dormant period:")
     after = query_for_non_csc108({
         "lo_nodes": 126,
         "hi_nodes": 312,
@@ -219,12 +219,12 @@ def analyze(connection):
         before["n"], after["mean"], after["sigma"], after["n"],
         equal_var = False)
 
-    print "Statistic: %s" % statistic
-    print "p-value: %s" % pvalue
+    print("Statistic: %s" % statistic)
+    print("p-value: %s" % pvalue)
 
     ###
 
-    print "Bin 5 before dormant period:"
+    print("Bin 5 before dormant period:")
     before = query_for_non_csc108({
         "lo_nodes": 1,
         "hi_nodes": 125,
@@ -232,7 +232,7 @@ def analyze(connection):
         "hi_time": middle
     })
 
-    print "Bin 5 during dormant period:"
+    print("Bin 5 during dormant period:")
     after = query_for_non_csc108({
         "lo_nodes": 1,
         "hi_nodes": 125,
@@ -246,8 +246,10 @@ def analyze(connection):
         before["n"], after["mean"], after["sigma"], after["n"],
         equal_var = False)
 
-    print "Statistic: %s" % statistic
-    print "p-value: %s" % pvalue
+    print("Statistic: %s" % statistic)
+    print("p-value: %s" % pvalue)
+
+    return
 
 ###
 
@@ -265,7 +267,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

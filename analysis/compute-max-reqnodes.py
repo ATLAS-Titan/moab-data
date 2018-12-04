@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  compute-max-reqnodes.py ~~
 #
@@ -17,7 +17,7 @@
 #   problem without simply populating the non-null values in ReqNodes.
 #
 #                                                       ~~ (c) SRW, 18 Jul 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -44,7 +44,7 @@ def analyze(connection):
         """
 
     for row in cursor.execute(query):
-        print "Max requested nodes: %s" % row["n"]
+        print("Max requested nodes: %s" % row["n"])
 
 ###
 
@@ -62,7 +62,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

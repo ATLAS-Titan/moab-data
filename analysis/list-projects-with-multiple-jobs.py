@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  list-projects-with-multiple-jobs.py ~~
 #
@@ -6,7 +6,7 @@
 #   jobs running or submitted on Titan.
 #
 #                                                       ~~ (c) SRW, 04 Aug 2018
-#                                                   ~~ last updated 04 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -49,8 +49,10 @@ def analyze(connection):
 
     for row in cursor.execute(query):
       # Match the format that SQLite uses, because we can.
-        print "%s|%s|%s|%s|%s" % (row["Account"], row["time"],
-            row["active_jobs"], row["eligible_jobs"], row["total_jobs"])
+        print("%s|%s|%s|%s|%s" % (row["Account"], row["time"],
+            row["active_jobs"], row["eligible_jobs"], row["total_jobs"]))
+
+    return
 
 ###
 
@@ -68,7 +70,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  count-jobs-by-bin-dormant.py ~~
 #
@@ -7,7 +7,7 @@
 #   running any ATLAS jobs on Titan.
 #
 #                                                       ~~ (c) SRW, 23 Aug 2018
-#                                                   ~~ last updated 17 Sep 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import json
 import os
@@ -48,29 +48,29 @@ def analyze(connection):
 
     ###
 
-    print "# of all jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
+    print("# of all jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
         count_between(1, 20000, 1530939600, 1532149200),
-        count_between(1, 20000, 1532149200, 1533358800))
+        count_between(1, 20000, 1532149200, 1533358800)))
 
-    print "# of bin 1 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
+    print("# of bin 1 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
         count_between(11250, 20000, 1530939600, 1532149200),
-        count_between(11250, 20000, 1532149200, 1533358800))
+        count_between(11250, 20000, 1532149200, 1533358800)))
 
-    print "# of bin 2 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
+    print("# of bin 2 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
         count_between(3750, 11249, 1530939600, 1532149200),
-        count_between(3750, 11249, 1532149200, 1533358800))
+        count_between(3750, 11249, 1532149200, 1533358800)))
 
-    print "# of bin 3 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
+    print("# of bin 3 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
         count_between(313, 3749, 1530939600, 1532149200),
-        count_between(313, 3749, 1532149200, 1533358800))
+        count_between(313, 3749, 1532149200, 1533358800)))
 
-    print "# of bin 4 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
+    print("# of bin 4 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
         count_between(126, 312, 1530939600, 1532149200),
-        count_between(126, 312, 1532149200, 1533358800))
+        count_between(126, 312, 1532149200, 1533358800)))
 
-    print "# of bin 5 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
+    print("# of bin 5 jobs:\n    Pre-dormant: %s\n        Dormant: %s" % (
         count_between(1, 125, 1530939600, 1532149200),
-        count_between(1, 125, 1532149200, 1533358800))
+        count_between(1, 125, 1532149200, 1533358800)))
 
 ###
 
@@ -88,7 +88,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

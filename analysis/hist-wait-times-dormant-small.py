@@ -1,4 +1,4 @@
-#-  Python 2.7 source code
+#-  Python 3 source code
 
 #-  hist-wait-times-dormant-small.py ~~
 #
@@ -12,7 +12,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 23 Aug 2018
-#                                                   ~~ last updated 23 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 from datetime import datetime
 
@@ -76,7 +76,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  count-samples-with-csc108-backfill.py ~~
 #
@@ -6,7 +6,7 @@
 #   being run by CSC108 in backfill mode on Titan.
 #
 #                                                       ~~ (c) SRW, 16 Jun 2018
-#                                                   ~~ last updated 29 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -47,13 +47,15 @@ def analyze(connection):
     for row in cursor.execute(query):
         total = row["n"]
 
-    print "Number of samples without CSC108 backfill present: %s" % no_csc108
-    print "Number of total samples: %s" % total
+    print("Number of samples without CSC108 backfill present: %s" % no_csc108)
+    print("Number of total samples: %s" % total)
 
     percent_not_present = 100.0 * no_csc108 / total
 
-    print "%% where CSC108 is not using backfill: %s" % percent_not_present
-    print "%% where CSC108 is using backfill: %s" % (100 - percent_not_present)
+    print("%% where CSC108 is not using backfill: %s" % percent_not_present)
+    print("%% where CSC108 is using backfill: %s" % (100 - percent_not_present))
+
+    return
 
 ###
 
@@ -71,7 +73,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

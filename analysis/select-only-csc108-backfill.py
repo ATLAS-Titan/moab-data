@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  select-only-csc108-backfill.py ~~
 #
@@ -9,7 +9,7 @@
 #   queries I have already written.
 #
 #                                                       ~~ (c) SRW, 29 Aug 2018
-#                                                   ~~ last updated 29 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import json
 import os
@@ -52,7 +52,9 @@ def analyze(connection):
         """
 
     for row in cursor.execute(query):
-        print "# of jobs: %s" % row["jobs"]
+        print("# of jobs: %s" % row["jobs"])
+
+    return
 
 ###
 
@@ -70,7 +72,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

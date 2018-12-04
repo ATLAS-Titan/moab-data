@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  find-csc108-blocking-bigger-jobs.py ~~
 #
@@ -8,7 +8,7 @@
 #   actually ended up doing.
 #
 #                                                       ~~ (c) SRW, 09 Aug 2018
-#                                                   ~~ last updated 29 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -55,9 +55,9 @@ def analyze(connection):
         results = {}
 
         for row in cursor.execute(query):
-            print "---"
-            print caption
-            print "Avg wait: %s (%s jobs)" % (row["avg_wait"], row["num_jobs"])
+            print("---")
+            print(caption)
+            print("Avg wait: %s (%s jobs)" % (row["avg_wait"], row["num_jobs"]))
 
     avg_wait("With CSC108, interval length 349799:", 1531923003, 1532272802)
 
@@ -69,7 +69,7 @@ def analyze(connection):
     avg_wait( "Without CSC108, interval length 386700 immediately after:",
         1532983201, 1533369901)
 
-    print "---"
+    print("---")
 
   # Those results are kind of weird, so I'm not sure what to make of them.
 
@@ -135,8 +135,8 @@ def analyze(connection):
 
     avg_ttfb = 1.0 * sum(times) / len(times)
 
-    print "Average TTFB (bins 1 and 2 jobs):  %s seconds" % (avg_ttfb)
-    print 'Number of "big blocks" (bins 1,2): %s' % (len(times))
+    print("Average TTFB (bins 1 and 2 jobs):  %s seconds" % (avg_ttfb))
+    print('Number of "big blocks" (bins 1,2): %s' % (len(times)))
 
     query = """
         SELECT  count(DISTINCT JobID) AS total_jobs
@@ -152,10 +152,10 @@ def analyze(connection):
     for row in cursor.execute(query):
         total_jobs = row["total_jobs"]
         percent = 100.0 * len(times) / total_jobs
-        print "# of CSC108 backfill jobs: %s" % (total_jobs)
-        print "%% of CSC108 backfill jobs that block big jobs: %s" % (percent)
+        print("# of CSC108 backfill jobs: %s" % (total_jobs))
+        print("%% of CSC108 backfill jobs that block big jobs: %s" % (percent))
 
-    print "---"
+    print("---")
 
   # Okay, that's been interesting, but now let's try the original problem,
   # which was posed in terms of relative job size: when are we blocking jobs
@@ -177,11 +177,11 @@ def analyze(connection):
         """
 
     for row in cursor.execute(query):
-        print "# of CSC108 jobs which block bigger jobs: %s" % (row[0])
-        print "%% of CSC108 jobs for which this occurs: %s" % (100.0 * row[0] /
-            total_jobs)
+        print("# of CSC108 jobs which block bigger jobs: %s" % (row[0]))
+        print("%% of CSC108 jobs for which this occurs: %s" % (100.0 * row[0] /
+            total_jobs))
 
-    print "---"
+    print("---")
 
   # Count the number of times a job larger than ours started running while ours
   # was already running.
@@ -206,12 +206,14 @@ def analyze(connection):
         ;
         """
     for row in cursor.execute(query):
-        print "# of CSC108 jobs running when bigger job starts: %s" % (row[0])
-        print "%% of CSC108 jobs for which this occurs: %s" % (100.0 * row[0] /             total_jobs)
+        print("# of CSC108 jobs running when bigger job starts: %s" % (row[0]))
+        print("%% of CSC108 jobs for which this occurs: %s" % (100.0 * row[0] /             total_jobs))
 
-    print "---"
+    print("---")
 
-    print "To be continued ..."
+    print("To be continued ...")
+
+    return
 
 ###
 
@@ -229,7 +231,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

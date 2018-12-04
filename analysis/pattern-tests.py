@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  pattern-tests.py ~~
 #
@@ -6,7 +6,7 @@
 #   I have noticed in the data actually hold for the entire dataset.
 #
 #                                                       ~~ (c) SRW, 20 Jun 2018
-#                                                   ~~ last updated 23 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -28,7 +28,7 @@ def analyze(connection):
         if row["LocalUpNodes"] != 0:
             ratio = float(row["LocalUpProcs"]) / row["LocalUpNodes"]
             if ratio != 16.0:
-                print "Up ratio: %s" % ratio
+                print("Up ratio: %s" % ratio)
 
   # Check that certain values are always zero in the "backfill" table.
 
@@ -40,7 +40,7 @@ def analyze(connection):
         fields_that_should_be_zero = ["index_", "reqid"]
         for field in fields_that_should_be_zero:
             if row[field] != 0:
-                print "%s is non-zero in backfill: %s" % (field, row[field])
+                print("%s is non-zero in backfill: %s" % (field, row[field]))
 
     query = """
         SELECT * FROM cluster;
@@ -53,7 +53,7 @@ def analyze(connection):
         ]
         for field in fields_that_should_be_zero:
             if row[field] != 0:
-                print "%s is non-zero in cluster: %s" % (field, row[field])
+                print("%s is non-zero in cluster: %s" % (field, row[field]))
 
   # Check that the relationship between nodes and processors is always 1:16
   # by checking to make sure that `ReqProcs` is always divisible by 16.
@@ -64,7 +64,7 @@ def analyze(connection):
 
     for row in cursor.execute(query):
         if row["remainder"] != 0:
-            print "Some value of `ReqProcs` is not divisible by 16."
+            print("Some value of `ReqProcs` is not divisible by 16.")
 
   # There is another weird thing I just figured out, though. It appears that
   # `ReqNodes` only appears when its value is not the same as `ReqProcs / 16`.
@@ -84,7 +84,7 @@ def analyze(connection):
 
     for row in cursor.execute(query):
         if row["n"] != 0:
-            print "Some (%s) values of 'SubmissionTime' changed." % row["n"]
+            print("Some (%s) values of 'SubmissionTime' changed." % row["n"])
 
   # So, SubmissionTime always stays the same, but it appear that the same is
   # not true of StartTime.
@@ -102,7 +102,7 @@ def analyze(connection):
 
     for row in cursor.execute(query):
         if row["n"] != 0:
-            print "Some (%s) values of 'StartTime' changed." % row["n"]
+            print("Some (%s) values of 'StartTime' changed." % row["n"])
 
 ###
 
@@ -120,7 +120,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

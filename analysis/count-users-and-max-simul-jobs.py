@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  count-users-and-max-simul-jobs.py ~~
 #
@@ -9,7 +9,7 @@
 #   exploration.
 #
 #                                                       ~~ (c) SRW, 18 Jul 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import json
 import os
@@ -47,8 +47,10 @@ def analyze(connection):
     for row in cursor.execute(query):
         jobs = row["jobs"]
         users = row["users"]
-        print "Users with 10 or more simul. jobs in last 30 days: %s" % users
-        print "Max number of simultaneous jobs in last 30 days: %s" % jobs
+        print("Users with 10 or more simul. jobs in last 30 days: %s" % users)
+        print("Max number of simultaneous jobs in last 30 days: %s" % jobs)
+
+    return
 
 ###
 
@@ -66,7 +68,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

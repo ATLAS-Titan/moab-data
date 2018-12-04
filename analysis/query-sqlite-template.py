@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  query-sqlite-template.py ~~
 #
@@ -6,7 +6,7 @@
 #   it's easy to start modifying the program in order to explore the data.
 #
 #                                                       ~~ (c) SRW, 15 Jun 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import json
 import os
@@ -24,14 +24,14 @@ def analyze(connection):
         """
 
     for row in cursor.execute(query):
-        print row[0]
+        print(row[0])
 
     query = """
         SELECT DISTINCT Account FROM active;
         """
 
     for row in cursor.execute(query):
-        print "Account: %s" % row["Account"]
+        print("Account: %s" % row["Account"])
 
 ###
 
@@ -49,7 +49,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

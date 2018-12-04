@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  count-small-jobs-by-user.py ~~
 #
@@ -13,7 +13,7 @@
 #   official OLCF policy only allows a user to run 2 such jobs simultaneously. 
 #
 #                                                       ~~ (c) SRW, 19 Jul 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -62,8 +62,10 @@ def analyze(connection):
         """
 
     for row in cursor.execute(query):
-        print "%s|%s|%s|%s|%s|%s" % (row["t"], row["SampleID"], row["Account"],
-                row["User"], row["jobs"], row["nodes"])
+        print("%s|%s|%s|%s|%s|%s" % (row["t"], row["SampleID"], row["Account"],
+                row["User"], row["jobs"], row["nodes"]))
+
+    return
 
 ###
 
@@ -81,7 +83,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

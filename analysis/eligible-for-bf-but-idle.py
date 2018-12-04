@@ -1,4 +1,4 @@
-#-  Python 2.6 source code
+#-  Python 3 source code
 
 #-  eligible-for-bf-but-idle.py ~~
 #
@@ -8,7 +8,7 @@
 #   walltime duration and requested number of processors.
 #
 #                                                       ~~ (c) SRW, 21 Jun 2018
-#                                                   ~~ last updated 25 Jul 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import os
 import sqlite3
@@ -46,7 +46,7 @@ def analyze(connection):
     num_eligible = 0
     for row in cursor.execute(query):
         num_eligible = row["n"]
-        print "Number eligible but idle: %s" % num_eligible
+        print("Number eligible but idle: %s" % num_eligible)
 
     query = """
         SELECT count(DISTINCT eligible.JobID) AS n FROM eligible;
@@ -55,10 +55,12 @@ def analyze(connection):
     num_total = 0
     for row in cursor.execute(query):
         num_total = row["n"]
-        print "Number of distinct job IDs: %s" % num_total
+        print("Number of distinct job IDs: %s" % num_total)
 
-    print "=> This has occurred for ~ %s%% of all jobs." % \
-        round(100.0 * num_eligible / num_total, 2)
+    print("=> This has occurred for ~ %s%% of all jobs." % (
+        round(100.0 * num_eligible / num_total, 2)))
+
+    return
 
 ###
 
@@ -76,7 +78,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 

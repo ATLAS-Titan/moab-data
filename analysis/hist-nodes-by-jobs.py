@@ -1,4 +1,4 @@
-#-  Python 2.7 source code
+#-  Python 3 source code
 
 #-  hist-nodes-by-jobs.py ~~
 #
@@ -11,7 +11,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 09 Jul 2018
-#                                                   ~~ last updated 17 Aug 2018
+#                                                   ~~ last updated 04 Dec 2018
 
 import math
 import matplotlib.pyplot as pyplot
@@ -75,7 +75,7 @@ def main():
     elif os.path.isdir(os.path.join(cwd, "moab")):
         data_dir = os.path.join(cwd, "moab")
     else:
-        raise "Data directory not found."
+        raise Exception("Data directory not found.")
 
   # Create string to represent path to database file.
 
