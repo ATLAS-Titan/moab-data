@@ -17,6 +17,8 @@
 #   lower than we thought, and it suggests that spatiotemporal blocks will be
 #   even less. Therefore, CSC108 is having less blocking impact than I thought!
 #
+#   NOTE: These percentages must be understood not to be from all samples, but
+#   rather from all samples for which CSC108 was actually utilizing backfill.
 #
 #                                                       ~~ (c) SRW, 05 Dec 2018
 #                                                   ~~ last updated 05 Dec 2018
@@ -72,6 +74,7 @@ def analyze(connection):
 
         WHERE
             csc108.procs > 0
+
             AND eligible.ReqProcs < (backfill.proccount + csc108.procs)
             AND eligible.Class = "batch"
 
@@ -120,6 +123,7 @@ def analyze(connection):
 
         WHERE
             csc108.procs > 0
+
             AND eligible.ReqProcs < backfill.proccount
             AND eligible.Class = "batch"
 
@@ -143,6 +147,22 @@ def analyze(connection):
                 count(DISTINCT eligible.SampleID) AS n
             FROM
                 eligible
+            INNER JOIN (
+                SELECT  SampleID,
+                        sum(ReqProcs) AS procs
+                    FROM
+                        active
+                    WHERE
+                        Account = "CSC108"
+                        AND User = "doleynik"
+                        AND JobName LIKE "SAGA-Python-PBSJobScript.%"
+                    GROUP BY
+                        SampleID
+            ) csc108 ON eligible.SampleID = csc108.SampleID
+
+            WHERE
+                csc108.procs > 0
+
             GROUP BY
                 month
             ORDER BY
@@ -153,7 +173,6 @@ def analyze(connection):
     for row in cursor.execute(query):
         month = row["month"]
         data[month]["total"] = row["n"]
-
 
     print(json.dumps(data, indent = 4))
 
@@ -179,33 +198,43 @@ def analyze(connection):
     ax.bar(ind, blocks,
         bottom = weirds,
         color = "r",
-        label = "Blocked by CSC108",
+        label = "Due to CSC108",
         zorder = 3
     )
     ax.bar(ind, weirds,
         color = "b",
-        label = "Unexplained",
+        label = "Other",
         zorder = 3
     )
 
-    #counter = 0
-    #years_spaced = []
-    #for year in years:
-    #    if (counter == 0):
-    #        years_spaced.append(year)
-    #    else:
-    #        years_spaced.append("")
-    #    counter = (counter + 1) % 1
+  # Make the month values pretty.
 
-    plt.xticks(ind, months)
+    pretty_months = []
+    for each in months:
+        pretty_months.append({
+            "01":   "Jan",
+            "02":   "Feb",
+            "03":   "Mar",
+            "04":   "Apr",
+            "05":   "May",
+            "06":   "Jun",
+            "07":   "Jul",
+            "08":   "Aug",
+            "09":   "Sep",
+            "10":   "Oct",
+            "11":   "Nov",
+            "12":   "Dec"
+        }[each[0:2]] + " " + each[-4:])
+
+    plt.xticks(ind, pretty_months)
 
     #plt.ylim(bottom = 86)
-    #plt.ylim(top = 94)
+    plt.ylim(top = 100)
 
   # Angle the x-axis labels so that the dates don't overlap so badly
     plt.gcf().autofmt_xdate()
 
-    ax.legend(loc = "upper center")
+    ax.legend(loc = "lower left", framealpha = 1)
 
     ax.set(
         xlabel = "",
