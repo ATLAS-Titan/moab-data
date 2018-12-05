@@ -6,7 +6,7 @@
 #   There are prettier ways to do it, but I'm in a hurry.
 #
 #                                                       ~~ (c) SRW, 28 Aug 2018
-#                                                   ~~ last updated 04 Dec 2018
+#                                                   ~~ last updated 05 Dec 2018
 
 import os
 import sqlite3
@@ -19,8 +19,7 @@ def analyze(connection):
 
     query = """
         SELECT  SampleID,
-                strftime("%d-%m-%Y %H:%M", SampleTime, "unixepoch",
-                    "localtime") AS time,
+                strftime("%d-%m-%Y %H:%M", SampleTime, "unixepoch") AS time,
                 max(nodes) AS n
             FROM (
                 SELECT  *,

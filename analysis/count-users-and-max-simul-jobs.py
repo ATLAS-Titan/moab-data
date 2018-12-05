@@ -9,7 +9,7 @@
 #   exploration.
 #
 #                                                       ~~ (c) SRW, 18 Jul 2018
-#                                                   ~~ last updated 04 Dec 2018
+#                                                   ~~ last updated 05 Dec 2018
 
 import json
 import os
@@ -27,8 +27,8 @@ def analyze(connection):
                 SELECT  User,
                         Account,
                         SampleID,
-                        strftime("%m-%d-%Y %H:%M", SampleTime, "unixepoch",
-                            "localtime") AS t,
+                        strftime("%m-%d-%Y %H:%M", SampleTime, "unixepoch")
+                            AS t,
                         count(*) AS jobs,
                         Sum(ReqProcs) AS procs
                     FROM active

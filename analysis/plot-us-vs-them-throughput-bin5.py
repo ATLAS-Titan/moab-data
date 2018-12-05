@@ -12,7 +12,7 @@
 #       $ module load python_anaconda2
 #
 #                                                       ~~ (c) SRW, 12 Oct 2018
-#                                                   ~~ last updated 04 Dec 2018
+#                                                   ~~ last updated 05 Dec 2018
 
 from datetime import datetime
 
@@ -32,8 +32,7 @@ def analyze(connection):
   # First, we will count the number of jobs per day for "us" (CSC108).
 
     query = """
-        SELECT  strftime("%m-%d-%Y", completed.CompletionTime, "unixepoch",
-                    "localtime")
+        SELECT  strftime("%m-%d-%Y", completed.CompletionTime, "unixepoch")
                         AS day,
                 count(DISTINCT csc108.JobID)
                         AS us,

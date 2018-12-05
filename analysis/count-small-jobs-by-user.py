@@ -13,7 +13,7 @@
 #   official OLCF policy only allows a user to run 2 such jobs simultaneously. 
 #
 #                                                       ~~ (c) SRW, 19 Jul 2018
-#                                                   ~~ last updated 04 Dec 2018
+#                                                   ~~ last updated 05 Dec 2018
 
 import os
 import sqlite3
@@ -37,8 +37,7 @@ def analyze(connection):
                 WHERE
                     nodes <= 125
         )
-        SELECT  strftime("%m-%d-%Y %H:%M", SampleTime, "unixepoch",
-                                                            "localtime") AS t,
+        SELECT  strftime("%m-%d-%Y %H:%M", SampleTime, "unixepoch") AS t,
                 SampleID,
                 Account,
                 User,

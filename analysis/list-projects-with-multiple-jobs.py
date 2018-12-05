@@ -6,7 +6,7 @@
 #   jobs running or submitted on Titan.
 #
 #                                                       ~~ (c) SRW, 04 Aug 2018
-#                                                   ~~ last updated 04 Dec 2018
+#                                                   ~~ last updated 05 Dec 2018
 
 import os
 import sqlite3
@@ -20,8 +20,7 @@ def analyze(connection):
     query = """
         SELECT DISTINCT
                 Account,
-                strftime("%m/%d/%Y %H:%M", SampleTime, "unixepoch",
-                    "localtime") AS time,
+                strftime("%m/%d/%Y %H:%M", SampleTime, "unixepoch") AS time,
                 active_jobs,
                 eligible_jobs,
                 max(active_jobs + eligible_jobs) AS total_jobs
