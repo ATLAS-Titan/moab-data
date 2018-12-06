@@ -17,7 +17,7 @@
 #   rather from all samples for which CSC108 was actually utilizing backfill.
 #
 #                                                       ~~ (c) SRW, 05 Dec 2018
-#                                                   ~~ last updated 05 Dec 2018
+#                                                   ~~ last updated 06 Dec 2018
 
 import datetime
 import json
@@ -53,8 +53,8 @@ def analyze(connection):
 
         INNER JOIN (
             SELECT  SampleID,
-                    max((StartTime + ReqAWDuration) - SampleTime)
-                        AS max_remaining
+                    sum((StartTime + ReqAWDuration) - SampleTime)
+                        AS total_remaining
                 FROM
                     active
                 WHERE
@@ -75,14 +75,14 @@ def analyze(connection):
          -- Make sure CSC108 is running in backfill. (This should be redundant,
          -- however, based on the construction of the query.)
 
-            AND csc108.max_remaining > 0
+            AND csc108.total_remaining > 0
 
          -- Find the rows where a job needs too long of a duration for
          -- backfill, but which would no longer be blocked if backfill were
          -- longer because CSC108 wasn't running anything.
 
             AND eligible.ReqAWDuration > backfill.duration
-            AND eligible.ReqAWDuration < csc108.max_remaining
+            AND eligible.ReqAWDuration < csc108.total_remaining
 
         GROUP BY
             month
@@ -113,8 +113,8 @@ def analyze(connection):
 
         INNER JOIN (
             SELECT  SampleID,
-                    max((StartTime + ReqAWDuration) - SampleTime)
-                        AS max_remaining
+                    sum((StartTime + ReqAWDuration) - SampleTime)
+                        AS total_remaining
                 FROM
                     active
                 WHERE
@@ -135,7 +135,7 @@ def analyze(connection):
          -- Make sure CSC108 is running in backfill. (This should be redundant,
          -- however, based on the construction of the query.)
 
-            AND csc108.max_remaining > 0
+            AND csc108.total_remaining > 0
 
          -- Find the rows where the job needs too long of a duration to make
          -- use of backfill opportunity.
@@ -164,8 +164,8 @@ def analyze(connection):
                 eligible
             INNER JOIN (
                 SELECT  SampleID,
-                        max((StartTime + ReqAWDuration) - SampleTime)
-                            AS max_remaining
+                        sum((StartTime + ReqAWDuration) - SampleTime)
+                            AS total_remaining
                     FROM
                         active
                     WHERE
@@ -177,7 +177,7 @@ def analyze(connection):
             ) csc108 ON eligible.SampleID = csc108.SampleID
 
             WHERE
-                csc108.max_remaining > 0
+                csc108.total_remaining > 0
 
             GROUP BY
                 month
@@ -251,7 +251,7 @@ def analyze(connection):
   # Angle the x-axis labels so that the dates don't overlap so badly
     plt.gcf().autofmt_xdate()
 
-    ax.legend(loc = "center right", framealpha = 1)
+    ax.legend(loc = "center left", framealpha = 1)
 
     ax.set(
         xlabel = "",

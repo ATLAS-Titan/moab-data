@@ -21,7 +21,7 @@
 #   rather from all samples for which CSC108 was actually utilizing backfill.
 #
 #                                                       ~~ (c) SRW, 05 Dec 2018
-#                                                   ~~ last updated 05 Dec 2018
+#                                                   ~~ last updated 06 Dec 2018
 
 import datetime
 import json
@@ -252,7 +252,7 @@ def analyze(connection):
   # Angle the x-axis labels so that the dates don't overlap so badly
     plt.gcf().autofmt_xdate()
 
-    ax.legend(loc = "center right", framealpha = 1)
+    ax.legend(loc = "center left", framealpha = 1)
 
     ax.set(
         xlabel = "",
