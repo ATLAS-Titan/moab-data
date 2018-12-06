@@ -34,12 +34,11 @@ def analyze(connection):
 
     cursor = connection.cursor()
 
-
     data = {
     #   month: {
-    #       "blocks":   0,
-    #       "total":    0,
-    #       "weird":    0
+    #       "all_blocks":       0,
+    #       "csc108_blocks":    0,
+    #       "total_samples":    0,
     #   }
     }
 
@@ -70,12 +69,20 @@ def analyze(connection):
             backfill.SampleID = eligible.SampleID
 
         WHERE
-            csc108.max_remaining > 0
 
-            AND (eligible.ReqAWDuration < backfill.duration
-                OR eligible.ReqAWDuration < csc108.max_remaining)
+            eligible.Class = "batch"
 
-            AND eligible.Class = "batch"
+         -- Make sure CSC108 is running in backfill. (This should be redundant,
+         -- however, based on the construction of the query.)
+
+            AND csc108.max_remaining > 0
+
+         -- Find the rows where a job needs too long of a duration for
+         -- backfill, but which would no longer be blocked if backfill were
+         -- longer because CSC108 wasn't running anything.
+
+            AND eligible.ReqAWDuration > backfill.duration
+            AND eligible.ReqAWDuration < csc108.max_remaining
 
         GROUP BY
             month
@@ -90,13 +97,13 @@ def analyze(connection):
         month = row["month"]
         if month not in data:
             data[month] = {
-                "blocks":   0,
-                "total":    0,
-                "weird":    0
+                "all_blocks":       0,
+                "csc108_blocks":    0,
+                "total_samples":    0
             }
-        data[month]["blocks"] = row["n"]
+        data[month]["csc108_blocks"] = row["n"]
 
-  # Second, compute the blocks that had nothing to do with CSC108.
+  # Second, compute all temporal blocks.
 
     query = """
         SELECT  strftime("%m-%Y", eligible.SampleTime, "unixepoch") AS month,
@@ -122,11 +129,18 @@ def analyze(connection):
             backfill.SampleID = eligible.SampleID
 
         WHERE
-            csc108.max_remaining > 0
 
-            AND eligible.ReqAWDuration < backfill.duration
+            eligible.Class = "batch"
 
-            AND eligible.Class = "batch"
+         -- Make sure CSC108 is running in backfill. (This should be redundant,
+         -- however, based on the construction of the query.)
+
+            AND csc108.max_remaining > 0
+
+         -- Find the rows where the job needs too long of a duration to make
+         -- use of backfill opportunity.
+
+            AND eligible.ReqAWDuration > backfill.duration
 
         GROUP BY
             month
@@ -139,7 +153,7 @@ def analyze(connection):
 
     for row in cursor.execute(query):
         month = row["month"]
-        data[month]["weird"] = row["n"]
+        data[month]["all_blocks"] = row["n"]
 
   # Finally, compute the total number of samples every month.
 
@@ -174,36 +188,37 @@ def analyze(connection):
 
     for row in cursor.execute(query):
         month = row["month"]
-        data[month]["total"] = row["n"]
+        data[month]["total_samples"] = row["n"]
 
     print(json.dumps(data, indent = 4))
 
   # Start putting the data together for the plot.
 
+    csc108 = []
     months = []
-    blocks = []
-    weirds = []
+    others = []
 
     for key in data:
+        csc108.append(100.0 * data[key]["csc108_blocks"] /
+            data[key]["total_samples"])
         months.append(key)
-        weirds.append(100.0 * data[key]["weird"] / data[key]["total"])
-        blocks.append((100.0 * data[key]["blocks"] / data[key]["total"])
-            - weirds[-1])
+        others.append((100.0 * data[key]["all_blocks"] /
+            data[key]["total_samples"]) - csc108[-1])
 
   # Set up the plot
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
-    ind = np.arange(len(blocks))
+    ind = np.arange(len(months))
 
-    ax.bar(ind, blocks,
-        bottom = weirds,
+    ax.bar(ind, csc108,
+        bottom = others,
         color = "r",
         label = "Due to CSC108",
         zorder = 3
     )
-    ax.bar(ind, weirds,
+    ax.bar(ind, others,
         color = "b",
         label = "Other",
         zorder = 3
@@ -236,7 +251,7 @@ def analyze(connection):
   # Angle the x-axis labels so that the dates don't overlap so badly
     plt.gcf().autofmt_xdate()
 
-    ax.legend(loc = "lower left", framealpha = 1)
+    ax.legend(loc = "center right", framealpha = 1)
 
     ax.set(
         xlabel = "",
